@@ -4,22 +4,28 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use App\Models\User; // Pastikan Anda sudah membuat model User
+use App\Models\User; // Pastikan model User di-import
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Validator; // Untuk validasi
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Storage; // Jika Anda menangani upload file di sini
 
 class AuthController extends Controller
 {
     /**
      * Menampilkan halaman login.
+     *
+     * @return \Illuminate\View\View
      */
     public function showLoginForm()
     {
-        return view('auth.login'); // resources/views/auth/login.blade.php
+        return view('auth.login'); // Pastikan view auth.login.blade.php ada
     }
 
     /**
      * Memproses percobaan login.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\RedirectResponse
      */
     public function login(Request $request)
     {
@@ -28,14 +34,14 @@ class AuthController extends Controller
             'password' => ['required'],
         ]);
 
-        if (Auth::attempt($credentials)) {
+        if (Auth::attempt($credentials, $request->filled('remember'))) {
             $request->session()->regenerate();
-            // Redirect ke halaman setelah login berhasil (misalnya dashboard pengguna atau homepage)
-            // Cek jika admin, redirect ke admin dashboard
-            if (Auth::user()->role === 'admin') { // Asumsi ada kolom 'role' di tabel users
-                return redirect()->intended('/admin/dashboard');
+
+            // Redirect berdasarkan role
+            if (Auth::user()->role === 'admin') {
+                return redirect()->intended(route('admin.dashboard'));
             }
-            return redirect()->intended('/');
+            return redirect()->intended(route('home')); // Atau ke dashboard pengguna jika ada
         }
 
         return back()->withErrors([
@@ -45,58 +51,67 @@ class AuthController extends Controller
 
     /**
      * Menampilkan halaman registrasi.
+     *
+     * @return \Illuminate\View\View
      */
     public function showRegistrationForm()
     {
-        return view('auth.register'); // resources/views/auth/register.blade.php
+        return view('auth.register'); // Pastikan view auth.register.blade.php ada
     }
 
     /**
      * Memproses registrasi pengguna baru.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\RedirectResponse
      */
     public function register(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'name' => ['required', 'string', 'max:255'], // Tambahkan 'name' jika diperlukan
+            'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
-            'password' => ['required', 'string', 'min:8', 'confirmed'], // 'confirmed' akan mencocokkan dengan 'password_confirmation'
-            'alamat' => ['nullable', 'string', 'max:255'], // Dari wireframe register
-            'no_telepon' => ['nullable', 'string', 'max:20'], // Dari wireframe register
+            'password' => ['required', 'string', 'min:8', 'confirmed'],
+            'alamat' => ['nullable', 'string', 'max:1000'],
+            'no_telepon' => ['nullable', 'string', 'max:20'],
+            'profile_photo' => ['nullable', 'image', 'mimes:jpeg,png,jpg', 'max:2048'],
         ]);
 
         if ($validator->fails()) {
             return back()->withErrors($validator)->withInput();
         }
 
+        $profilePhotoPath = null;
+        if ($request->hasFile('profile_photo')) {
+            $profilePhotoPath = $request->file('profile_photo')->store('profile-photos', 'public');
+        }
+
         $user = User::create([
-            'name' => $request->name, // Jika ada input nama
+            'name' => $request->name,
             'email' => $request->email,
             'password' => Hash::make($request->password),
             'alamat' => $request->alamat,
             'no_telepon' => $request->no_telepon,
-            // 'role' => 'user', // Set default role jika ada
+            'profile_photo_path' => $profilePhotoPath,
+            'role' => 'user', // Default role
+            'email_verified_at' => now(), // Jika ingin langsung verifikasi email
         ]);
 
         Auth::login($user);
 
-        // Redirect ke halaman setelah registrasi berhasil
-        return redirect('/');
+        return redirect(route('home')); // Redirect ke homepage setelah registrasi
     }
 
     /**
      * Memproses logout pengguna.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\RedirectResponse
      */
     public function logout(Request $request)
     {
         Auth::logout();
         $request->session()->invalidate();
         $request->session()->regenerateToken();
-        return redirect('/'); // Redirect ke homepage setelah logout
+        return redirect('/');
     }
-
-    // Anda bisa menambahkan method untuk Lupa Password di sini
-    // public function showLinkRequestForm() { ... }
-    // public function sendResetLinkEmail(Request $request) { ... }
-    // public function showResetForm($token) { ... }
-    // public function reset(Request $request) { ... }
 }
