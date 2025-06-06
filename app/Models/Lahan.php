@@ -15,6 +15,7 @@ class Lahan extends Model
         'deskripsi',
         'harga_sewa',
         'alamat_lengkap',
+        'no_whatsapp', // TAMBAHKAN INI
         'gambar_utama',
         'status',
         'tipe_lahan',

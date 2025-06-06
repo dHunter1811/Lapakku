@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers; // Sesuaikan jika ini TambahLahanController
+namespace App\Http\Controllers;
 
 use App\Models\Lahan;
 use Illuminate\Http\Request;
@@ -8,7 +8,6 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Storage;
 
-// Ganti nama class jika Anda menggunakan TambahLahanController
 class TambahLahanController extends Controller
 {
     public function formTambah()
@@ -16,7 +15,7 @@ class TambahLahanController extends Controller
         return view('lahanbaru.tambah');
     }
 
-    public function simpanLahanBaru(Request $request) // Atau 'store' jika di LahanController
+    public function simpanLahanBaru(Request $request)
     {
         $validator = Validator::make($request->all(), [
             'judul' => 'required|string|max:255',
@@ -25,28 +24,30 @@ class TambahLahanController extends Controller
             'lokasi' => 'required|string|in:Banjarmasin Selatan,Banjarmasin Timur,Banjarmasin Barat,Banjarmasin Tengah,Banjarmasin Utara',
             'harga_sewa' => 'required|numeric|min:1',
             'alamat_lengkap' => 'required|string',
+            'no_whatsapp' => ['nullable', 'string', 'regex:/^([0-9\s\-\+\(\)]*)$/', 'min:10', 'max:20'], // === VALIDASI DITAMBAHKAN ===
             'keuntungan_lokasi' => 'nullable|array',
             'keuntungan_lokasi.*' => 'nullable|string|max:255',
+            'latitude' => ['nullable', 'regex:/^[-]?(([0-8]?[0-9])\.(\d+)|90(\.0+)?)$/'],
+            'longitude' => ['nullable', 'regex:/^[-]?((((1[0-7][0-9])|([0-9]?[0-9]))\.(\d+))|180(\.0+)?)$/'],
             'gambar_utama' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048',
             'galeri_1' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
             'galeri_2' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
             'galeri_3' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
-            'latitude' => ['nullable', 'regex:/^[-]?(([0-8]?[0-9])\.(\d+)|90(\.0+)?)$/'], // Validasi Latitude
-            'longitude' => ['nullable', 'regex:/^[-]?((((1[0-7][0-9])|([0-9]?[0-9]))\.(\d+))|180(\.0+)?)$/'], // Validasi Longitude
         ],[
             'latitude.regex' => 'Format latitude tidak valid.',
             'longitude.regex' => 'Format longitude tidak valid.',
         ]);
 
         if ($validator->fails()) {
-            return redirect()->route('lahanbaru.tambah') // Sesuaikan nama route jika berbeda
+            return redirect()->route('lahanbaru.tambah')
                         ->withErrors($validator)
                         ->withInput();
         }
 
         $dataToCreate = $request->only([
             'judul', 'deskripsi', 'tipe_lahan', 'lokasi', 'harga_sewa', 'alamat_lengkap',
-            'latitude', 'longitude' // Tambahkan latitude dan longitude
+            'latitude', 'longitude',
+            'no_whatsapp' // === FIELD DIAMBIL DARI REQUEST ===
         ]);
         $dataToCreate['user_id'] = Auth::id();
         $dataToCreate['status'] = 'Menunggu';

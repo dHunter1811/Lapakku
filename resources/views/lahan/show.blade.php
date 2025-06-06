@@ -34,6 +34,47 @@
     .btn-ajukan-sewa { margin-top:15px; padding:12px; font-size:1.05em; font-weight: 500; }
     .btn-edit-lahan { margin-top:10px; padding:10px; font-size:0.95em; background-color: #6c757d; border-color: #6c757d;}
     .btn-edit-lahan:hover { background-color: #5a6268; border-color: #545b62;}
+
+    /* === STYLE BARU UNTUK GRUP TOMBOL AKSI === */
+    .action-buttons-group {
+        display: flex;
+        gap: 10px; /* Jarak antar tombol */
+        margin-top: 15px;
+    }
+    .action-buttons-group .btn {
+        flex: 1; /* Membuat tombol berbagi ruang */
+        padding: 12px 10px;
+        font-size: 0.95em;
+        font-weight: 500;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 6px;
+        transition: background-color 0.2s ease, transform 0.1s ease;
+    }
+    .action-buttons-group .btn:hover {
+        transform: translateY(-1px);
+    }
+    .action-buttons-group .btn .icon {
+        margin-right: 8px;
+        font-size: 1.2em; /* Ukuran ikon sedikit lebih besar */
+    }
+    .btn-whatsapp {
+        background-color: #25D366;
+        color: white !important; /* !important untuk override warna link <a> */
+    }
+    .btn-whatsapp:hover {
+        background-color: #1DA851;
+    }
+    .btn-ajukan-sewa-sistem {
+        background-color: #00796B; /* Warna primer Anda */
+        color: white;
+    }
+    .btn-ajukan-sewa-sistem:hover {
+        background-color: #00695C;
+    }
+    /* === AKHIR STYLE BARU === */
+
     .lahan-rating-section { margin-top: 40px; padding-top:25px; border-top:1px solid #e5e5e5; }
     .rating-form-card { padding:20px; background-color:#fdfdfd; border: 1px solid #f0f0f0; }
     .user-rating-card { padding:15px; border: 1px solid #f0f0f0; }
@@ -83,29 +124,69 @@
 
             {{-- Kolom Kanan --}}
             <div class="lahan-detail-sidebar">
+                {{-- ... Konten Kolom Kanan (Harga, Galeri, Peta, Kontak Pemilik) ... --}}
                 <h2 class="lahan-harga">Rp {{ number_format($lahan->harga_sewa, 0, ',', '.') }} <span class="harga-suffix">/ bulan</span></h2>
                 <hr class="sidebar-divider">
-
                 <h4 class="sidebar-subtitle">Galeri Lokasi</h4>
                 <div class="galeri-grid-sidebar">
                     @php $galeriImages = []; if ($lahan->galeri_1) $galeriImages[] = $lahan->galeri_1; if ($lahan->galeri_2) $galeriImages[] = $lahan->galeri_2; if ($lahan->galeri_3) $galeriImages[] = $lahan->galeri_3; @endphp
                     @if(!empty($galeriImages)) @foreach($galeriImages as $index => $gPath) <a href="{{ Storage::url($gPath) }}" data-lightbox="galeri-lahan" data-title="Galeri {{ $index + 1 }}" class="galeri-thumbnail-link"><img src="{{ Storage::url($gPath) }}" alt="Galeri Lokasi {{ $index + 1 }}" class="galeri-thumbnail-img"></a> @endforeach @for ($i = count($galeriImages); $i < 3; $i++) <div class="galeri-placeholder">Galeri {{ $i + 1 }}</div> @endfor
                     @else @for ($i = 0; $i < 3; $i++) <div class="galeri-placeholder">Galeri {{ $i + 1 }}</div> @endfor <p class="text-muted-small text-center" style="grid-column: 1 / -1;">Tidak ada gambar galeri.</p> @endif
                 </div>
-
                 <h4 class="sidebar-subtitle">Lokasi di Peta</h4>
                 @if($lahan->latitude && $lahan->longitude)
                     <div id="mapDisplay"></div>
                 @else
                     <div class="map-placeholder">Lokasi peta tidak tersedia.</div>
                 @endif
-
                 <h4 class="sidebar-subtitle" style="margin-top:20px;">Kontak Pemilik</h4>
                 <div class="kontak-pemilik-info">@if($lahan->user)<p><strong>Nama:</strong> {{ $lahan->user->name }}</p><p><strong>Email:</strong> {{ $lahan->user->email }}</p><p><strong>No. Telepon:</strong> {{ $lahan->user->no_telepon ?? '-' }}</p>@else<p class="text-muted">Informasi pemilik tidak tersedia.</p>@endif</div>
 
-                @auth @if(Auth::id() !== $lahan->user_id)<button type="button" class="btn btn-primary btn-block btn-ajukan-sewa" onclick="openAjukanSewaModal()">Ajukan Sewa Sekarang</button>@else<p class="text-muted text-center" style="margin-top:15px;">Ini adalah lahan Anda.</p>@endif
-                @else <a href="{{ route('login', ['redirect' => url()->current()]) }}" class="btn btn-primary btn-block btn-ajukan-sewa">Login untuk Ajukan Sewa</a>@endauth
-                @auth @if(Auth::id() == $lahan->user_id || (Auth::user() && Auth::user()->role == 'admin'))<a href="{{ route('lahan.edit', $lahan->id) }}" class="btn btn-secondary btn-block btn-edit-lahan">Edit Lahan Ini</a>@endif @endauth
+                {{-- === PERBAIKAN TOMBOL AKSI === --}}
+                @auth
+                    {{-- Hanya tampilkan tombol jika pengguna yang login BUKAN pemilik lahan ini --}}
+                    @if(Auth::id() !== $lahan->user_id)
+                        <div class="action-buttons-group">
+                            {{-- Tombol WhatsApp (hanya tampil jika no_whatsapp ada) --}}
+                            @if($lahan->no_whatsapp)
+                                @php
+                                    // Format nomor telepon ke format internasional (misal: dari 0812... menjadi 62812...)
+                                    $nomorWhatsApp = preg_replace('/[^0-9]/', '', $lahan->no_whatsapp);
+                                    if (substr($nomorWhatsApp, 0, 1) === '0') {
+                                        $nomorWhatsApp = '62' . substr($nomorWhatsApp, 1);
+                                    } elseif (substr($nomorWhatsApp, 0, 2) !== '62') {
+                                        $nomorWhatsApp = '62' . $nomorWhatsApp;
+                                    }
+                                    // Siapkan pesan otomatis
+                                    $pesanWhatsApp = urlencode("Halo, saya tertarik untuk menyewa lahan \"{$lahan->judul}\" yang saya lihat di Lapakku.");
+                                @endphp
+                                <a href="https://wa.me/{{ $nomorWhatsApp }}?text={{ $pesanWhatsApp }}" target="_blank" class="btn btn-whatsapp">
+                                    <span class="icon">💬</span> WhatsApp
+                                </a>
+                            @endif
+
+                            {{-- Tombol Ajukan Sewa via sistem (selalu ada) --}}
+                            <button type="button" class="btn btn-ajukan-sewa-sistem" onclick="openAjukanSewaModal()">
+                                <span class="icon">📝</span> Ajukan Sewa
+                            </button>
+                        </div>
+                    @else
+                        {{-- Jika pengguna adalah pemilik lahan --}}
+                        <p class="text-muted text-center" style="margin-top:15px;">Ini adalah lahan Anda.</p>
+                    @endif
+                @else
+                    {{-- Jika belum login --}}
+                    <a href="{{ route('login', ['redirect' => url()->current()]) }}" class="btn btn-primary btn-block">
+                        Login untuk Menghubungi Pemilik
+                    </a>
+                @endauth
+
+                @auth
+                    @if(Auth::id() == $lahan->user_id || (Auth::user() && Auth::user()->role == 'admin'))
+                        <a href="{{ route('lahan.edit', $lahan->id) }}" class="btn btn-secondary btn-block btn-edit-lahan">Edit Lahan Ini</a>
+                    @endif
+                @endauth
+                {{-- ============================== --}}
             </div>
         </div>
         {{-- Bagian Rating & Ulasan dan Modal Ajukan Sewa --}}
