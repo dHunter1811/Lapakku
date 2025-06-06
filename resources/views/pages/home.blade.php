@@ -9,17 +9,17 @@
         <div class="hero-content">
             <h1 class="hero-title">Temukan Lahan Usaha Ideal untuk Bisnis Anda</h1>
             <p class="hero-subtitle">Solusi tepat sewa ruko, kios, dan lahan terbuka untuk kebutuhan UMKM dengan lokasi strategis</p>
-            
+
             <form action="{{ route('lahan.index') }}" method="GET" class="search-form">
                 <div class="search-input-group">
                     <svg class="search-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
-                        <path d="M11 2c4.968 0 9 4.032 9 9s-4.032 9-9 9-9-4.032-9-9 4.032-9 9-9zm0 16c3.867 0 7-3.133 7-7 0-3.868-3.133-7-7-7-3.868 0-7 3.132-7 7 0 3.867 3.132 7 7 7zm8.485.071l2.829 2.828-1.415 1.415-2.828-2.829 1.414-1.414z"/>
+                        <path d="M11 2c4.968 0 9 4.032 9 9s-4.032 9-9 9-9-4.032-9-9 4.032-9 9-9zm0 16c3.867 0 7-3.133 7-7 0-3.868-3.133-7-7-7-3.868 0-7 3.132-7 7 0 3.867 3.132 7 7 7zm8.485.071l2.829 2.828-1.415 1.415-2.828-2.829 1.414-1.414z" />
                     </svg>
                     <input type="text" name="search" placeholder="Cari lokasi, ruko, kios, atau area..." class="search-input">
                     <button type="submit" class="search-button">Cari Lahan</button>
                 </div>
             </form>
-            
+
             <div class="hero-actions">
                 <a href="{{ route('lahan.index') }}" class="secondary-button" style="width: auto;">Lihat Semua Lahan</a>
                 <a href="{{ route('lahan.create') }}" class="primary-button" style="width: auto;">Pasang Iklan Lahan</a>
@@ -33,26 +33,28 @@
             <h2>Jelajahi Kategori</h2>
             <p>Temukan jenis lahan yang sesuai kebutuhan bisnis Anda</p>
         </div>
-        
+
         <div class="categories-grid">
             @php
-                $categories = [
-                    ['name' => 'Ruko', 'icon' => '🏠', 'color' => '#E3F2FD'],
-                    ['name' => 'Kios', 'icon' => '🏪', 'color' => '#E8F5E9'],
-                    ['name' => 'Area Pasar', 'icon' => '🛒', 'color' => '#FFF8E1'],
-                    ['name' => 'Lahan Terbuka', 'icon' => '🌳', 'color' => '#F1F8E9'],
-                    ['name' => 'Gudang', 'icon' => '🏭', 'color' => '#F3E5F5'],
-                    ['name' => 'Lainnya', 'icon' => '➕', 'color' => '#E0F7FA']
-                ];
+            $categories = [
+            ['name' => 'Ruko', 'icon' => '🏠', 'color' => '#E3F2FD'],
+            ['name' => 'Kios', 'icon' => '🏪', 'color' => '#E8F5E9'],
+            ['name' => 'Area Pasar', 'icon' => '🛒', 'color' => '#FFF8E1'],
+            ['name' => 'Lahan Terbuka', 'icon' => '🌳', 'color' => '#F1F8E9'],
+            ['name' => 'Gudang', 'icon' => '🏭', 'color' => '#F3E5F5'],
+            ['name' => 'Lainnya', 'icon' => '➕', 'color' => '#E0F7FA']
+            ];
             @endphp
-            
+
             @foreach($categories as $category)
-            <a href="{{ route('lahan.index', ['kategori' => Str::slug($category['name'])]) }}" class="category-card" style="background-color: {{ $category['color'] }};">
+            <a href="{{ route('lahan.index', ['kategori' => Str::slug($category['name'])]) }}"
+                class="category-card"
+                style="<?php echo 'background-color: ' . $category['color'] . ';'; ?>">
                 <div class="category-icon">{{ $category['icon'] }}</div>
                 <h3>{{ $category['name'] }}</h3>
                 <span class="category-link">Lihat Semua <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
-                    <path fill-rule="evenodd" d="M1 8a.5.5 0 0 1 .5-.5h11.793l-3.147-3.146a.5.5 0 0 1 .708-.708l4 4a.5.5 0 0 1 0 .708l-4 4a.5.5 0 0 1-.708-.708L13.293 8.5H1.5A.5.5 0 0 1 1 8z"/>
-                </svg></span>
+                        <path fill-rule="evenodd" d="M1 8a.5.5 0 0 1 .5-.5h11.793l-3.147-3.146a.5.5 0 0 1 .708-.708l4 4a.5.5 0 0 1 0 .708l-4 4a.5.5 0 0 1-.708-.708L13.293 8.5H1.5A.5.5 0 0 1 1 8z" />
+                    </svg></span>
             </a>
             @endforeach
         </div>
@@ -64,7 +66,7 @@
             <h2>Rekomendasi Lahan Terbaik</h2>
             <p>Lahan-lahan pilihan dengan lokasi strategis</p>
         </div>
-        
+
         <div class="properties-grid">
             @forelse ($rekomendasiLahan ?? [] as $lahan)
             <div class="property-card">
@@ -79,7 +81,7 @@
                     <h3><a href="{{ route('lahan.show', $lahan) }}">{{ Str::limit($lahan->judul, 50) }}</a></h3>
                     <div class="property-location">
                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
-                            <path d="M8 16s6-5.686 6-10A6 6 0 0 0 2 6c0 4.314 6 10 6 10zm0-7a3 3 0 1 1 0-6 3 3 0 0 1 0 6z"/>
+                            <path d="M8 16s6-5.686 6-10A6 6 0 0 0 2 6c0 4.314 6 10 6 10zm0-7a3 3 0 1 1 0-6 3 3 0 0 1 0 6z" />
                         </svg>
                         {{ Str::limit($lahan->alamat_lengkap, 30) }}
                     </div>
@@ -87,13 +89,13 @@
                     <div class="property-meta">
                         <div class="meta-item">
                             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
-                                <path d="M3.5 0a.5.5 0 0 1 .5.5V1h8V.5a.5.5 0 0 1 1 0V1h1a2 2 0 0 1 2 2v11a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V3a2 2 0 0 1 2-2h1V.5a.5.5 0 0 1 .5-.5zM1 4v10a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V4H1z"/>
+                                <path d="M3.5 0a.5.5 0 0 1 .5.5V1h8V.5a.5.5 0 0 1 1 0V1h1a2 2 0 0 1 2 2v11a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V3a2 2 0 0 1 2-2h1V.5a.5.5 0 0 1 .5-.5zM1 4v10a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V4H1z" />
                             </svg>
-                                {{ $lahan->created_at->diffForHumans() }}
+                            {{ $lahan->created_at->diffForHumans() }}
                         </div>
                         <div class="meta-item">
                             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
-                                <path d="M3.612 15.443c-.386.198-.824-.149-.746-.592l.83-4.73L.173 6.765c-.329-.314-.158-.888.283-.95l4.898-.696L7.538.792c.197-.39.73-.39.927 0l2.184 4.327 4.898.696c.441.062.612.636.282.95l-3.522 3.356.83 4.73c.078.443-.36.79-.746.592L8 13.187l-4.389 2.256z"/>
+                                <path d="M3.612 15.443c-.386.198-.824-.149-.746-.592l.83-4.73L.173 6.765c-.329-.314-.158-.888.283-.95l4.898-.696L7.538.792c.197-.39.73-.39.927 0l2.184 4.327 4.898.696c.441.062.612.636.282.95l-3.522 3.356.83 4.73c.078.443-.36.79-.746.592L8 13.187l-4.389 2.256z" />
                             </svg>
                             {{-- number_format($lahan->averageRating(), 1) --}} ({{-- $lahan->ratings_count --}} ulasan)
                         </div>
@@ -109,7 +111,7 @@
             </div>
             @endforelse
         </div>
-        
+
         <div class="section-footer">
             <a href="{{ route('lahan.index') }}" class="view-all-button">Lihat Semua Lahan Tersedia</a>
         </div>
@@ -121,7 +123,7 @@
             <h2>Apa Kata Pengguna Kami?</h2>
             <p>Testimonial dari pemilik dan penyewa lahan</p>
         </div>
-        
+
         <div class="testimonials-grid">
             <div class="testimonial-card">
                 <div class="testimonial-content">
@@ -136,7 +138,7 @@
                     </div>
                 </div>
             </div>
-            
+
             <div class="testimonial-card">
                 <div class="testimonial-content">
                     <div class="quote-icon">"</div>
@@ -150,7 +152,7 @@
                     </div>
                 </div>
             </div>
-            
+
             <div class="testimonial-card">
                 <div class="testimonial-content">
                     <div class="quote-icon">"</div>
@@ -675,40 +677,41 @@
         .hero-title {
             font-size: 2rem;
         }
-        
+
         .hero-subtitle {
             font-size: 1rem;
         }
-        
+
         .search-input-group {
             flex-direction: column;
         }
-        
+
         .search-input {
             width: 100%;
             border-radius: var(--radius) var(--radius) 0 0 !important;
         }
-        
+
         .search-button {
             width: 100%;
             padding: 15px;
             border-radius: 0 0 var(--radius) var(--radius) !important;
         }
-        
+
         .hero-actions {
             flex-direction: column;
             gap: 10px;
         }
-        
-        .primary-button, .secondary-button {
+
+        .primary-button,
+        .secondary-button {
             width: 100%;
             text-align: center;
         }
-        
+
         .categories-grid {
             grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
         }
-        
+
         .cta-buttons {
             flex-direction: column;
         }
@@ -718,11 +721,11 @@
         .section-header h2 {
             font-size: 1.5rem;
         }
-        
+
         .property-card {
             width: 100%;
         }
-        
+
         .testimonials-grid {
             grid-template-columns: 1fr;
         }
