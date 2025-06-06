@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers; // Sesuaikan jika ini TambahLahanController
 
 use App\Models\Lahan;
 use Illuminate\Http\Request;
@@ -8,31 +8,15 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Storage;
 
+// Ganti nama class jika Anda menggunakan TambahLahanController
 class TambahLahanController extends Controller
 {
-    /**
-     * Hanya user yang sudah login yang bisa mengakses method di controller ini.
-     * Middleware akan diterapkan di route.
-     */
-
-    /**
-     * Menampilkan form untuk menambah lahan baru.
-     *
-     * @return \Illuminate\View\View
-     */
     public function formTambah()
     {
-        // Langsung tampilkan view baru
-        return view('lahanbaru.tambah'); // Akan mencari resources/views/lahanbaru/tambah.blade.php
+        return view('lahanbaru.tambah');
     }
 
-    /**
-     * Menyimpan lahan baru ke database.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\RedirectResponse
-     */
-    public function simpanLahanBaru(Request $request)
+    public function simpanLahanBaru(Request $request) // Atau 'store' jika di LahanController
     {
         $validator = Validator::make($request->all(), [
             'judul' => 'required|string|max:255',
@@ -42,37 +26,39 @@ class TambahLahanController extends Controller
             'harga_sewa' => 'required|numeric|min:1',
             'alamat_lengkap' => 'required|string',
             'keuntungan_lokasi' => 'nullable|array',
-            'keuntungan_lokasi.*' => 'nullable|string|max:255', // Validasi setiap item dalam array
+            'keuntungan_lokasi.*' => 'nullable|string|max:255',
             'gambar_utama' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048',
             'galeri_1' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
             'galeri_2' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
             'galeri_3' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'latitude' => ['nullable', 'regex:/^[-]?(([0-8]?[0-9])\.(\d+)|90(\.0+)?)$/'], // Validasi Latitude
+            'longitude' => ['nullable', 'regex:/^[-]?((((1[0-7][0-9])|([0-9]?[0-9]))\.(\d+))|180(\.0+)?)$/'], // Validasi Longitude
+        ],[
+            'latitude.regex' => 'Format latitude tidak valid.',
+            'longitude.regex' => 'Format longitude tidak valid.',
         ]);
 
         if ($validator->fails()) {
-            return redirect()->route('lahanbaru.tambah') // Redirect ke route baru jika validasi gagal
+            return redirect()->route('lahanbaru.tambah') // Sesuaikan nama route jika berbeda
                         ->withErrors($validator)
                         ->withInput();
         }
 
         $dataToCreate = $request->only([
-            'judul', 'deskripsi', 'tipe_lahan', 'lokasi', 'harga_sewa', 'alamat_lengkap'
+            'judul', 'deskripsi', 'tipe_lahan', 'lokasi', 'harga_sewa', 'alamat_lengkap',
+            'latitude', 'longitude' // Tambahkan latitude dan longitude
         ]);
-        $dataToCreate['user_id'] = Auth::id(); // Pastikan user login (middleware di route akan menangani ini)
-        $dataToCreate['status'] = 'Menunggu'; // Status awal
+        $dataToCreate['user_id'] = Auth::id();
+        $dataToCreate['status'] = 'Menunggu';
 
-        // Proses Keuntungan Lokasi
         if ($request->has('keuntungan_lokasi')) {
             $keuntungan = array_filter($request->keuntungan_lokasi, fn($value) => !is_null($value) && $value !== '');
             $dataToCreate['keuntungan_lokasi'] = !empty($keuntungan) ? array_values($keuntungan) : null;
         }
 
-        // Proses Gambar Utama
         if ($request->hasFile('gambar_utama')) {
             $dataToCreate['gambar_utama'] = $request->file('gambar_utama')->store('lahan_images/utama', 'public');
         }
-
-        // Proses Gambar Galeri
         for ($i = 1; $i <= 3; $i++) {
             $galeriField = 'galeri_' . $i;
             if ($request->hasFile($galeriField)) {
@@ -82,6 +68,6 @@ class TambahLahanController extends Controller
 
         Lahan::create($dataToCreate);
 
-        return redirect()->route('lahan.index')->with('success', 'Lahan baru berhasil ditambahkan dan sedang menunggu persetujuan.');
+        return redirect()->route('lahan.index')->with('success', 'Lahan berhasil ditambahkan dan sedang menunggu persetujuan.');
     }
 }

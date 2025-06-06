@@ -2,6 +2,29 @@
 
 @section('title', 'Tambah Lahan Baru - Lapakku')
 
+{{-- Tambahkan CSS Leaflet di head --}}
+@push('styles')
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+    integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
+    crossorigin=""/>
+<style>
+    #mapInput { height: 400px; width: 100%; border-radius: 8px; margin-bottom: 15px; border: 1px solid #ced4da; }
+    .form-control-file { display: block; width: 100%; padding: .375rem .75rem; font-size: 1rem; font-weight: 400; line-height: 1.5; color: #495057; background-color: #fff; background-clip: padding-box; border: 1px solid #ced4da; border-radius: .25rem; }
+    .form-control-file:focus { border-color: #80bdff; outline: 0; box-shadow: 0 0 0 .2rem rgba(0,123,255,.25); }
+    .form-control-sm { font-size: .875rem; padding: .25rem .5rem; }
+    .form-label-sm { font-size: .875rem; margin-bottom: .2rem; display: block; }
+    .row { display: flex; flex-wrap: wrap; margin-right: -7.5px; margin-left: -7.5px; }
+    .col-md-4, .col-md-6 { position: relative; width: 100%; padding-right: 7.5px; padding-left: 7.5px; }
+    @media (min-width: 768px) {
+        .col-md-4 { flex: 0 0 33.333333%; max-width: 33.333333%; }
+        .col-md-6 { flex: 0 0 50%; max-width: 50%; }
+    }
+    .mb-2 { margin-bottom: .5rem!important; }
+    .map-search-container { display: flex; gap: 10px; margin-bottom: 10px; }
+    .map-search-container input[type="text"] { flex-grow: 1; }
+</style>
+@endpush
+
 @section('content')
 <div class="container">
     <div class="card" style="max-width: 750px; margin: 30px auto; padding: 30px;">
@@ -18,20 +41,17 @@
             </div>
         @endif
 
-        {{-- Action form diubah ke route baru --}}
         <form action="{{ route('lahanbaru.simpan') }}" method="POST" enctype="multipart/form-data">
             @csrf
-
+            {{-- ... (Field Judul, Deskripsi, Tipe, Lokasi, Harga, Alamat Lengkap seperti sebelumnya) ... --}}
             <div class="form-group">
                 <label for="judul">Judul Lahan / Nama Properti</label>
                 <input type="text" name="judul" id="judul" class="form-control" value="{{ old('judul') }}" placeholder="Contoh: Ruko Strategis 2 Lantai di Pusat Kota" required>
             </div>
-
             <div class="form-group">
                 <label for="deskripsi">Deskripsi Lengkap Lahan</label>
                 <textarea name="deskripsi" id="deskripsi" class="form-control" rows="6" placeholder="Jelaskan detail lahan Anda, fasilitas, keunggulan, dll." required>{{ old('deskripsi') }}</textarea>
             </div>
-
             <div class="row">
                 <div class="col-md-6">
                     <div class="form-group">
@@ -60,15 +80,28 @@
                     </div>
                 </div>
             </div>
-
             <div class="form-group">
                 <label for="harga_sewa">Harga Sewa (per bulan, dalam Rupiah)</label>
                 <input type="number" name="harga_sewa" id="harga_sewa" class="form-control" value="{{ old('harga_sewa') }}" placeholder="Contoh: 5000000" required min="1">
             </div>
-
             <div class="form-group">
                 <label for="alamat_lengkap">Alamat Lengkap Lahan</label>
                 <textarea name="alamat_lengkap" id="alamat_lengkap" class="form-control" rows="3" placeholder="Contoh: Jl. Pramuka No. 10, RT 05 RW 02, Kel. Pemurus Luar (Selain Kecamatan)" required>{{ old('alamat_lengkap') }}</textarea>
+            </div>
+
+            {{-- Peta Interaktif untuk Input Lokasi --}}
+            <div class="form-group">
+                <label for="mapInput">Tandai Lokasi di Peta:</label>
+                 <div class="map-search-container">
+                    <input type="text" id="mapSearchInput" class="form-control form-control-sm" placeholder="Cari alamat atau tempat...">
+                    <button type="button" id="mapSearchButton" class="btn btn-info btn-sm">Cari</button>
+                </div>
+                <div id="mapInput"></div>
+                <input type="hidden" name="latitude" id="latitude" value="{{ old('latitude') }}">
+                <input type="hidden" name="longitude" id="longitude" value="{{ old('longitude') }}">
+                <small class="form-text text-muted">Klik pada peta untuk menentukan lokasi lahan Anda. Anda juga bisa mencari alamat.</small>
+                 @error('latitude') <span class="text-danger d-block">{{ $message }}</span> @enderror
+                 @error('longitude') <span class="text-danger d-block">{{ $message }}</span> @enderror
             </div>
 
             <div class="form-group">
@@ -87,19 +120,11 @@
 
             <div class="form-group">
                 <label>Galeri Lokasi (Opsional, maksimal 3 gambar)</label>
+                {{-- ... (Input Galeri seperti sebelumnya) ... --}}
                 <div class="row">
-                    <div class="col-md-4 mb-2">
-                        <label for="galeri_1" class="form-label-sm">Gambar Galeri 1</label>
-                        <input type="file" name="galeri_1" id="galeri_1" class="form-control-file form-control-sm" accept="image/png, image/jpeg, image/jpg, image/gif">
-                    </div>
-                    <div class="col-md-4 mb-2">
-                        <label for="galeri_2" class="form-label-sm">Gambar Galeri 2</label>
-                        <input type="file" name="galeri_2" id="galeri_2" class="form-control-file form-control-sm" accept="image/png, image/jpeg, image/jpg, image/gif">
-                    </div>
-                    <div class="col-md-4 mb-2">
-                        <label for="galeri_3" class="form-label-sm">Gambar Galeri 3</label>
-                        <input type="file" name="galeri_3" id="galeri_3" class="form-control-file form-control-sm" accept="image/png, image/jpeg, image/jpg, image/gif">
-                    </div>
+                    <div class="col-md-4 mb-2"><label for="galeri_1" class="form-label-sm">Gambar Galeri 1</label><input type="file" name="galeri_1" id="galeri_1" class="form-control-file form-control-sm" accept="image/png, image/jpeg, image/jpg, image/gif"></div>
+                    <div class="col-md-4 mb-2"><label for="galeri_2" class="form-label-sm">Gambar Galeri 2</label><input type="file" name="galeri_2" id="galeri_2" class="form-control-file form-control-sm" accept="image/png, image/jpeg, image/jpg, image/gif"></div>
+                    <div class="col-md-4 mb-2"><label for="galeri_3" class="form-label-sm">Gambar Galeri 3</label><input type="file" name="galeri_3" id="galeri_3" class="form-control-file form-control-sm" accept="image/png, image/jpeg, image/jpg, image/gif"></div>
                 </div>
                 <small class="form-text text-muted">Format: JPG, PNG, GIF. Maks: 2MB per gambar.</small>
             </div>
@@ -112,18 +137,81 @@
 </div>
 @endsection
 
-@push('styles')
-<style>
-    .form-control-file { display: block; width: 100%; padding: .375rem .75rem; font-size: 1rem; font-weight: 400; line-height: 1.5; color: #495057; background-color: #fff; background-clip: padding-box; border: 1px solid #ced4da; border-radius: .25rem; }
-    .form-control-file:focus { border-color: #80bdff; outline: 0; box-shadow: 0 0 0 .2rem rgba(0,123,255,.25); }
-    .form-control-sm { font-size: .875rem; padding: .25rem .5rem; }
-    .form-label-sm { font-size: .875rem; margin-bottom: .2rem; display: block; }
-    .row { display: flex; flex-wrap: wrap; margin-right: -7.5px; margin-left: -7.5px; }
-    .col-md-4, .col-md-6 { position: relative; width: 100%; padding-right: 7.5px; padding-left: 7.5px; }
-    @media (min-width: 768px) {
-        .col-md-4 { flex: 0 0 33.333333%; max-width: 33.333333%; }
-        .col-md-6 { flex: 0 0 50%; max-width: 50%; }
+{{-- Tambahkan JavaScript Leaflet di akhir body --}}
+@push('scripts')
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+    integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
+    crossorigin=""></script>
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    // Koordinat default (Banjarmasin)
+    let defaultLat = -3.3173; // Perkiraan tengah Banjarmasin
+    let defaultLng = 114.5900;
+    let defaultZoom = 13;
+
+    const latInput = document.getElementById('latitude');
+    const lngInput = document.getElementById('longitude');
+    const mapSearchInput = document.getElementById('mapSearchInput');
+    const mapSearchButton = document.getElementById('mapSearchButton');
+
+    // Inisialisasi peta
+    const map = L.map('mapInput').setView([defaultLat, defaultLng], defaultZoom);
+
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+    }).addTo(map);
+
+    let marker = null;
+
+    // Jika ada nilai old latitude dan longitude (misalnya dari error validasi), set marker awal
+    if (latInput.value && lngInput.value) {
+        const oldLat = parseFloat(latInput.value);
+        const oldLng = parseFloat(lngInput.value);
+        if (!isNaN(oldLat) && !isNaN(oldLng)) {
+            marker = L.marker([oldLat, oldLng]).addTo(map);
+            map.setView([oldLat, oldLng], 16); // Zoom lebih dekat ke marker yang sudah ada
+        }
     }
-    .mb-2 { margin-bottom: .5rem!important; }
-</style>
+
+    map.on('click', function(e) {
+        if (marker) { // Jika marker sudah ada, pindahkan
+            marker.setLatLng(e.latlng);
+        } else { // Jika belum ada, buat marker baru
+            marker = L.marker(e.latlng).addTo(map);
+        }
+        latInput.value = e.latlng.lat.toFixed(7);
+        lngInput.value = e.latlng.lng.toFixed(7);
+    });
+
+    // Fungsi pencarian alamat
+    mapSearchButton.addEventListener('click', function() {
+        const address = mapSearchInput.value;
+        if (address.trim() === '') return;
+
+        // Menggunakan Nominatim OpenStreetMap untuk Geocoding
+        fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(address)}&limit=1`)
+            .then(response => response.json())
+            .then(data => {
+                if (data && data.length > 0) {
+                    const lat = parseFloat(data[0].lat);
+                    const lon = parseFloat(data[0].lon);
+                    map.setView([lat, lon], 16); // Zoom ke lokasi yang dicari
+                    if (marker) {
+                        marker.setLatLng([lat, lon]);
+                    } else {
+                        marker = L.marker([lat, lon]).addTo(map);
+                    }
+                    latInput.value = lat.toFixed(7);
+                    lngInput.value = lon.toFixed(7);
+                } else {
+                    alert('Alamat tidak ditemukan. Coba kata kunci yang lebih spesifik atau tandai manual di peta.');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Terjadi kesalahan saat mencari alamat.');
+            });
+    });
+});
+</script>
 @endpush

@@ -23,6 +23,8 @@ class Lahan extends Model
         'galeri_1',          // Tambahkan ini
         'galeri_2',          // Tambahkan ini
         'galeri_3',          // Tambahkan ini
+        'latitude',  // TAMBAHKAN INI
+        'longitude', // TAMBAHKAN INI
     ];
 
     /**
@@ -33,6 +35,8 @@ class Lahan extends Model
     protected $casts = [
         'harga_sewa' => 'decimal:2',
         'keuntungan_lokasi' => 'array', // Otomatis konversi ke/dari JSON
+        'latitude' => 'decimal:7',  // Pastikan cast jika perlu
+        'longitude' => 'decimal:7', // Pastikan cast jika perlu
     ];
 
     /**

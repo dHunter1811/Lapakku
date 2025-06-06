@@ -10,8 +10,6 @@ use Illuminate\Support\Facades\Storage;
 
 class LahanController extends Controller
 {
-    // Method index() tetap sama seperti yang sudah Anda miliki dan perbaiki sebelumnya
-
     public function index(Request $request)
     {
         $query = Lahan::query()->where('status', 'Disetujui');
@@ -26,92 +24,78 @@ class LahanController extends Controller
             $searchTerm = $request->search;
             $query->where(function ($q) use ($searchTerm) {
                 $q->where('judul', 'like', '%' . $searchTerm . '%')
-                  ->orWhere('alamat_lengkap', 'like', '%' . $searchTerm . '%');
+                  ->orWhere('alamat_lengkap', 'like', '%' . $searchTerm . '%')
+                  ->orWhere('deskripsi', 'like', '%' . $searchTerm . '%');
             });
         }
-        if ($request->filled('sort_by')) {
-            switch ($request->sort_by) {
-                case 'termurah':
-                    $query->orderBy('harga_sewa', 'asc');
-                    break;
-                case 'termahal':
-                    $query->orderBy('harga_sewa', 'desc');
-                    break;
-                case 'terbaru':
-                default:
-                    $query->latest();
-                    break;
-            }
-        } else {
-            $query->latest();
+        
+        $sortBy = $request->input('sort_by', 'terbaru');
+        switch ($sortBy) {
+            case 'termurah':
+                $query->orderBy('harga_sewa', 'asc');
+                break;
+            case 'termahal':
+                $query->orderBy('harga_sewa', 'desc');
+                break;
+            case 'terbaru':
+            default:
+                $query->latest();
+                break;
         }
 
         $lahanList = $query->paginate(9);
         return view('lahan.index', compact('lahanList'));
     }
 
-
     public function create()
     {
-        if (!Auth::check()) {
-            return redirect()->route('login')->with('error', 'Anda harus login untuk menambah lahan.');
-        }
+        // Middleware 'auth' pada route sudah memastikan hanya user login yang bisa akses.
         return view('lahan.create');
     }
 
     public function store(Request $request)
     {
-        if (!Auth::check()) {
-            return redirect()->route('login');
-        }
-
         $validator = Validator::make($request->all(), [
             'judul' => 'required|string|max:255',
             'deskripsi' => 'required|string',
             'tipe_lahan' => 'required|string|in:Ruko,Kios,Pasar,Lahan Terbuka,Lainnya',
             'lokasi' => 'required|string|in:Banjarmasin Selatan,Banjarmasin Timur,Banjarmasin Barat,Banjarmasin Tengah,Banjarmasin Utara',
-            'harga_sewa' => 'required|numeric|min:0',
+            'harga_sewa' => 'required|numeric|min:1',
             'alamat_lengkap' => 'required|string',
-            'keuntungan_lokasi' => 'nullable|array', // Keuntungan adalah array
-            'keuntungan_lokasi.*' => 'nullable|string|max:255', // Setiap item dalam array keuntungan adalah string
+            'keuntungan_lokasi' => 'nullable|array',
+            'keuntungan_lokasi.*' => 'nullable|string|max:255',
+            'latitude' => ['nullable', 'regex:/^[-]?(([0-8]?[0-9])\.(\d+)|90(\.0+)?)$/'],
+            'longitude' => ['nullable', 'regex:/^[-]?((((1[0-7][0-9])|([0-9]?[0-9]))\.(\d+))|180(\.0+)?)$/'],
             'gambar_utama' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048',
             'galeri_1' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
             'galeri_2' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
             'galeri_3' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+        ],[
+            'latitude.regex' => 'Format latitude tidak valid.',
+            'longitude.regex' => 'Format longitude tidak valid.',
         ]);
 
         if ($validator->fails()) {
-            return redirect()->route('lahan.create')
+            return redirect()->route('lahan.create') // atau lahanbaru.tambah jika Anda menggunakan itu
                         ->withErrors($validator)
                         ->withInput();
         }
 
-        $dataToCreate = [
-            'user_id' => Auth::id(),
-            'judul' => $request->judul,
-            'deskripsi' => $request->deskripsi,
-            'tipe_lahan' => $request->tipe_lahan,
-            'lokasi' => $request->lokasi,
-            'harga_sewa' => $request->harga_sewa,
-            'alamat_lengkap' => $request->alamat_lengkap,
-            'status' => 'Menunggu',
-        ];
+        $dataToCreate = $request->only([ // Ambil semua field yang relevan
+            'judul', 'deskripsi', 'tipe_lahan', 'lokasi', 'harga_sewa', 'alamat_lengkap',
+            'latitude', 'longitude' // PASTIKAN INI DIAMBIL
+        ]);
+        $dataToCreate['user_id'] = Auth::id();
+        $dataToCreate['status'] = 'Menunggu';
 
-        // Proses Keuntungan Lokasi (filter yang kosong)
         if ($request->has('keuntungan_lokasi')) {
-            $keuntungan = array_filter($request->keuntungan_lokasi, function ($value) {
-                return !is_null($value) && $value !== '';
-            });
-            $dataToCreate['keuntungan_lokasi'] = !empty($keuntungan) ? array_values($keuntungan) : null; // Simpan sebagai array atau null jika kosong
+            $keuntungan = array_filter($request->keuntungan_lokasi, fn($value) => !is_null($value) && $value !== '');
+            $dataToCreate['keuntungan_lokasi'] = !empty($keuntungan) ? array_values($keuntungan) : null;
         }
 
-
-        // Proses Gambar Utama
         if ($request->hasFile('gambar_utama')) {
             $dataToCreate['gambar_utama'] = $request->file('gambar_utama')->store('lahan_images/utama', 'public');
         }
-
-        // Proses Gambar Galeri
         for ($i = 1; $i <= 3; $i++) {
             $galeriField = 'galeri_' . $i;
             if ($request->hasFile($galeriField)) {
@@ -120,7 +104,6 @@ class LahanController extends Controller
         }
 
         Lahan::create($dataToCreate);
-
         return redirect()->route('lahan.index')->with('success', 'Lahan berhasil ditambahkan dan sedang menunggu persetujuan.');
     }
 
@@ -136,7 +119,7 @@ class LahanController extends Controller
     public function edit(Lahan $lahan)
     {
         if (Auth::id() !== $lahan->user_id && (Auth::check() && optional(Auth::user())->role !== 'admin')) {
-            return redirect()->route('lahan.index')->with('error', 'Anda tidak memiliki izin untuk mengedit lahan ini.');
+             return redirect()->route('lahan.index')->with('error', 'Anda tidak memiliki izin untuk mengedit lahan ini.');
         }
         return view('lahan.edit', compact('lahan'));
     }
@@ -152,15 +135,22 @@ class LahanController extends Controller
             'deskripsi' => 'required|string',
             'tipe_lahan' => 'required|string|in:Ruko,Kios,Pasar,Lahan Terbuka,Lainnya',
             'lokasi' => 'required|string|in:Banjarmasin Selatan,Banjarmasin Timur,Banjarmasin Barat,Banjarmasin Tengah,Banjarmasin Utara',
-            'harga_sewa' => 'required|numeric|min:0',
+            'harga_sewa' => 'required|numeric|min:1', // Sesuai dengan store
             'alamat_lengkap' => 'required|string',
             'keuntungan_lokasi' => 'nullable|array',
             'keuntungan_lokasi.*' => 'nullable|string|max:255',
+            'latitude' => ['nullable', 'regex:/^[-]?(([0-8]?[0-9])\.(\d+)|90(\.0+)?)$/'], // VALIDASI UNTUK KOORDINAT
+            'longitude' => ['nullable', 'regex:/^[-]?((((1[0-7][0-9])|([0-9]?[0-9]))\.(\d+))|180(\.0+)?)$/'], // VALIDASI UNTUK KOORDINAT
             'gambar_utama' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
             'galeri_1' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
             'galeri_2' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
             'galeri_3' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
-            'status' => (optional(Auth::user())->role === 'admin' && $request->has('status')) ? 'required|string|in:Menunggu,Disetujui,Ditolak' : 'nullable',
+            // Untuk status, hanya admin yang bisa mengubahnya melalui form edit lahan milik user.
+            // Jika user biasa yang mengedit, statusnya bisa direset ke 'Menunggu' atau dibiarkan.
+            // 'status' => (Auth::user()->role === 'admin' && $request->has('status')) ? 'required|string|in:Menunggu,Disetujui,Ditolak' : 'nullable',
+        ],[
+            'latitude.regex' => 'Format latitude tidak valid.',
+            'longitude.regex' => 'Format longitude tidak valid.',
         ]);
 
         if ($validator->fails()) {
@@ -169,28 +159,36 @@ class LahanController extends Controller
                         ->withInput();
         }
 
+        // Ambil semua field yang relevan dari request, TERMASUK latitude dan longitude
         $dataToUpdate = $request->only([
             'judul', 'deskripsi', 'tipe_lahan', 'lokasi',
-            'harga_sewa', 'alamat_lengkap'
+            'harga_sewa', 'alamat_lengkap',
+            'latitude', 'longitude' // PASTIKAN INI ADA
         ]);
-
-        // Proses Keuntungan Lokasi
-        if ($request->has('keuntungan_lokasi')) {
-            $keuntungan = array_filter($request->keuntungan_lokasi, function ($value) {
-                return !is_null($value) && $value !== '';
-            });
-             $dataToUpdate['keuntungan_lokasi'] = !empty($keuntungan) ? array_values($keuntungan) : null;
+        
+        // Logika status jika user biasa mengedit
+        if (Auth::user()->role !== 'admin') {
+            // Jika lahan sebelumnya belum disetujui, atau Anda ingin setiap editan direview ulang
+            // Anda bisa set status kembali ke 'Menunggu'
+            // if ($lahan->status !== 'Disetujui') {
+            //    $dataToUpdate['status'] = 'Menunggu';
+            // }
+            // Untuk saat ini, kita tidak akan mengubah status jika diedit user biasa,
+            // kecuali jika ada kebijakan khusus. Admin bisa mengubahnya via panel admin.
         } else {
-            // Jika tidak ada input keuntungan_lokasi sama sekali (misalnya semua field dikosongkan), set ke null
-            $dataToUpdate['keuntungan_lokasi'] = null;
+            // Jika admin mengedit, dan mengirim field status (misalnya dari admin edit form)
+            if($request->has('status')){
+                $dataToUpdate['status'] = $request->status;
+            }
         }
 
-
-        if (optional(Auth::user())->role === 'admin' && $request->has('status')) {
-            $dataToUpdate['status'] = $request->status;
+        if ($request->has('keuntungan_lokasi')) {
+            $keuntungan = array_filter($request->keuntungan_lokasi, fn($value) => !is_null($value) && $value !== '');
+            $dataToUpdate['keuntungan_lokasi'] = !empty($keuntungan) ? array_values($keuntungan) : null;
+        } else {
+            $dataToUpdate['keuntungan_lokasi'] = $lahan->keuntungan_lokasi; // Pertahankan nilai lama jika tidak ada input baru
         }
 
-        // Proses Gambar Utama
         if ($request->hasFile('gambar_utama')) {
             if ($lahan->gambar_utama && Storage::disk('public')->exists($lahan->gambar_utama)) {
                 Storage::disk('public')->delete($lahan->gambar_utama);
@@ -198,31 +196,17 @@ class LahanController extends Controller
             $dataToUpdate['gambar_utama'] = $request->file('gambar_utama')->store('lahan_images/utama', 'public');
         }
 
-        // Proses Gambar Galeri
         for ($i = 1; $i <= 3; $i++) {
             $galeriField = 'galeri_' . $i;
-            $hapusGaleriField = 'hapus_' . $galeriField; // Jika Anda menambahkan checkbox hapus
-
-            // Jika ada file baru diupload untuk slot galeri ini
             if ($request->hasFile($galeriField)) {
-                // Hapus gambar lama di slot ini jika ada
                 if ($lahan->$galeriField && Storage::disk('public')->exists($lahan->$galeriField)) {
                     Storage::disk('public')->delete($lahan->$galeriField);
                 }
-                // Simpan gambar baru
                 $dataToUpdate[$galeriField] = $request->file($galeriField)->store('lahan_images/galeri', 'public');
             }
-            // (Opsional) Jika Anda menambahkan checkbox untuk menghapus gambar galeri yang sudah ada
-            // elseif ($request->has($hapusGaleriField) && $request->$hapusGaleriField == '1') {
-            //     if ($lahan->$galeriField && Storage::disk('public')->exists($lahan->$galeriField)) {
-            //         Storage::disk('public')->delete($lahan->$galeriField);
-            //     }
-            //     $dataToUpdate[$galeriField] = null; // Set path di DB menjadi null
-            // }
         }
-
+        
         $lahan->update($dataToUpdate);
-
         return redirect()->route('lahan.show', $lahan->id)->with('success', 'Lahan berhasil diperbarui.');
     }
 
@@ -231,21 +215,16 @@ class LahanController extends Controller
         if (Auth::id() !== $lahan->user_id && (Auth::check() && optional(Auth::user())->role !== 'admin')) {
             return redirect()->route('lahan.index')->with('error', 'Anda tidak memiliki izin untuk menghapus lahan ini.');
         }
-
-        // Hapus Gambar Utama
         if ($lahan->gambar_utama && Storage::disk('public')->exists($lahan->gambar_utama)) {
             Storage::disk('public')->delete($lahan->gambar_utama);
         }
-        // Hapus Gambar Galeri
         for ($i = 1; $i <= 3; $i++) {
             $galeriField = 'galeri_' . $i;
             if ($lahan->$galeriField && Storage::disk('public')->exists($lahan->$galeriField)) {
                 Storage::disk('public')->delete($lahan->$galeriField);
             }
         }
-
         $lahan->delete();
-
         return redirect()->route('lahan.index')->with('success', 'Lahan berhasil dihapus.');
     }
 }
