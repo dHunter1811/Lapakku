@@ -159,6 +159,13 @@
                             <input type="number" name="harga_sewa" id="harga_sewa" class="form-control" value="{{ old('harga_sewa', $lahan->harga_sewa) }}" required min="1">
                         </div>
 
+                        {{-- NOMOR WHATSAPP DITAMBAHKAN DI SINI --}}
+                        <div class="form-group">
+                            <label for="no_whatsapp" class="form-label">Nomor WhatsApp</label>
+                            <input type="tel" name="no_whatsapp" id="no_whatsapp" class="form-control" value="{{ old('no_whatsapp', $lahan->no_whatsapp) }}" placeholder="Contoh: 08123456xxxx">
+                            <small class="form-text text-muted">Nomor ini akan digunakan untuk tombol "Hubungi via WhatsApp".</small>
+                        </div>
+
                         <div class="form-group">
                             <label for="tipe_lahan" class="form-label">Tipe Lahan</label>
                             <select name="tipe_lahan" id="tipe_lahan" class="form-select" required>

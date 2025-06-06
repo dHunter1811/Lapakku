@@ -78,20 +78,25 @@ class LahanManagementController extends Controller
      */
     public function update(Request $request, Lahan $lahan)
     {
+        // Otorisasi sudah ditangani oleh middleware di route, tidak perlu pengecekan Auth di sini
+        
         $validator = Validator::make($request->all(), [
             'judul' => 'required|string|max:255',
             'deskripsi' => 'required|string',
-            'tipe_lahan' => 'required|string|in:Ruko,Kios,Pasar,Lahan Terbuka,Lainnya', // Pastikan ada di form edit admin
-            'lokasi' => 'required|string|in:Banjarmasin Selatan,Banjarmasin Timur,Banjarmasin Barat,Banjarmasin Tengah,Banjarmasin Utara', // Pastikan ada di form edit admin
-            'harga_sewa' => 'required|numeric|min:0',
+            'tipe_lahan' => 'required|string|in:Ruko,Kios,Pasar,Lahan Terbuka,Lainnya',
+            'lokasi' => 'required|string|in:Banjarmasin Selatan,Banjarmasin Timur,Banjarmasin Barat,Banjarmasin Tengah,Banjarmasin Utara',
+            'harga_sewa' => 'required|numeric|min:1',
             'alamat_lengkap' => 'required|string',
-            'status' => 'required|string|in:Menunggu,Disetujui,Ditolak',
-            'gambar_utama' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'no_whatsapp' => ['nullable', 'string', 'regex:/^([0-9\s\-\+\(\)]*)$/', 'min:10', 'max:20'], // === VALIDASI DITAMBAHKAN ===
             'keuntungan_lokasi' => 'nullable|array',
             'keuntungan_lokasi.*' => 'nullable|string|max:255',
+            'latitude' => ['nullable', 'regex:/^[-]?(([0-8]?[0-9])\.(\d+)|90(\.0+)?)$/'],
+            'longitude' => ['nullable', 'regex:/^[-]?((((1[0-7][0-9])|([0-9]?[0-9]))\.(\d+))|180(\.0+)?)$/'],
+            'gambar_utama' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
             'galeri_1' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
             'galeri_2' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
             'galeri_3' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'status' => 'required|string|in:Menunggu,Disetujui,Ditolak',
         ]);
 
         if ($validator->fails()) {
@@ -100,9 +105,11 @@ class LahanManagementController extends Controller
                         ->withInput();
         }
 
+        // Ambil semua field yang relevan dari request
         $dataToUpdate = $request->only([
-            'judul', 'deskripsi', 'tipe_lahan', 'lokasi',
-            'harga_sewa', 'alamat_lengkap', 'status'
+            'judul', 'deskripsi', 'tipe_lahan', 'lokasi', 'harga_sewa', 'alamat_lengkap', 'status',
+            'latitude', 'longitude',
+            'no_whatsapp' // === FIELD DIAMBIL DARI REQUEST ===
         ]);
 
         // Proses Keuntungan Lokasi
@@ -110,7 +117,7 @@ class LahanManagementController extends Controller
             $keuntungan = array_filter($request->keuntungan_lokasi, fn($value) => !is_null($value) && $value !== '');
             $dataToUpdate['keuntungan_lokasi'] = !empty($keuntungan) ? array_values($keuntungan) : null;
         } else {
-            $dataToUpdate['keuntungan_lokasi'] = null;
+            $dataToUpdate['keuntungan_lokasi'] = null; // Kosongkan jika tidak ada input
         }
 
         // Proses Gambar Utama
@@ -130,13 +137,6 @@ class LahanManagementController extends Controller
                 }
                 $dataToUpdate[$galeriField] = $request->file($galeriField)->store('lahan_images/galeri', 'public');
             }
-            // Jika ada opsi untuk menghapus gambar galeri yang ada (misalnya via checkbox)
-            // elseif ($request->input('hapus_' . $galeriField)) {
-            //     if ($lahan->$galeriField && Storage::disk('public')->exists($lahan->$galeriField)) {
-            //         Storage::disk('public')->delete($lahan->$galeriField);
-            //     }
-            //     $dataToUpdate[$galeriField] = null;
-            // }
         }
 
         $lahan->update($dataToUpdate);
@@ -150,7 +150,6 @@ class LahanManagementController extends Controller
     public function approve(Lahan $lahan)
     {
         $lahan->update(['status' => 'Disetujui']);
-        // Kirim notifikasi ke pemilik lahan jika perlu
         return redirect()->back()->with('success', 'Lahan "' . $lahan->judul . '" berhasil disetujui.');
     }
 
@@ -160,7 +159,6 @@ class LahanManagementController extends Controller
     public function reject(Lahan $lahan)
     {
         $lahan->update(['status' => 'Ditolak']);
-        // Kirim notifikasi ke pemilik lahan jika perlu
         return redirect()->back()->with('success', 'Lahan "' . $lahan->judul . '" berhasil ditolak.');
     }
 
@@ -180,9 +178,6 @@ class LahanManagementController extends Controller
                 Storage::disk('public')->delete($lahan->$galeriField);
             }
         }
-
-        // Hapus juga rating terkait jika ada foreign key constraint atau Anda ingin membersihkannya
-        // $lahan->ratings()->delete(); // Uncomment jika relasi ratings ada dan ingin dihapus bersamaan
 
         $lahan->delete();
         return redirect()->route('admin.lahan.index')->with('success', 'Lahan "' . $lahan->judul . '" berhasil dihapus permanen.');
