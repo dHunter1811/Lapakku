@@ -220,13 +220,8 @@
             <a href="{{ route('admin.ratings.index') }}" class="{{ request()->routeIs('admin.ratings.*') ? 'active' : '' }}"><span class="icon">⭐</span>Daftar Rating</a>
             <a href="{{ route('admin.messages.index') }}" class="{{ request()->routeIs('admin.messages.*') ? 'active' : '' }}"><span class="icon">✉️</span>Pesan Masuk</a>
             <a href="{{ route('admin.users.index') }}" class="{{ request()->routeIs('admin.users.*') ? 'active' : '' }}"><span class="icon">👥</span>Manajemen User</a>
+            <a href="{{ route('home') }}" target="_blank"><span class="icon">🌐</span>Lihat Situs Publik</a>
         </nav>
-        {{-- Link ke Halaman Utama di bagian bawah sidebar --}}
-        <div class="sidebar-footer">
-            <a href="{{ route('home') }}" target="_blank">
-                <span class="icon">🌐</span>Lihat Situs Publik
-            </a>
-        </div>
     </aside>
 
     <div class="admin-main-content">
