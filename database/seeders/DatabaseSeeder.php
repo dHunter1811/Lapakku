@@ -3,6 +3,8 @@
 namespace Database\Seeders;
 
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
+
+use App\Models\User;
 use Illuminate\Database\Seeder;
 
 class DatabaseSeeder extends Seeder
@@ -16,6 +18,7 @@ class DatabaseSeeder extends Seeder
 
         // Panggil seeder Anda di sini:
         $this->call([
+            UserSeeder::class, // Pastikan UserSeeder sudah ada
             AdminUserSeeder::class, // Panggil seeder admin terlebih dahulu
             // UserSeeder::class, // Jika Anda punya seeder untuk user biasa
             LahanSeeder::class,
