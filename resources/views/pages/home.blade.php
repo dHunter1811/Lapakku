@@ -21,8 +21,8 @@
             </form>
             
             <div class="hero-actions">
-                <a href="{{ route('lahan.index') }}" class="secondary-button">Lihat Semua Lahan</a>
-                <a href="{{ route('lahan.create') }}" class="primary-button">Pasang Iklan Lahan</a>
+                <a href="{{ route('lahan.index') }}" class="secondary-button" style="width: auto;">Lihat Semua Lahan</a>
+                <a href="{{ route('lahan.create') }}" class="primary-button" style="width: auto;">Pasang Iklan Lahan</a>
             </div>
         </div>
     </section>
@@ -105,7 +105,7 @@
                 <img src="{{ asset('images/no-properties.svg') }}" alt="No properties" class="empty-image">
                 <h3>Belum ada lahan yang tersedia</h3>
                 <p>Silakan coba lagi nanti atau pasang iklan lahan Anda</p>
-                <a href="{{ route('lahan.create') }}" class="primary-button">Pasang Iklan</a>
+                <a href="{{ route('lahan.create') }}" class="primary-button" style="width: auto;">Pasang Iklan</a>
             </div>
             @endforelse
         </div>
@@ -173,8 +173,8 @@
             <h2>Siap Memulai Bisnis Anda?</h2>
             <p>Temukan lokasi sempurna atau pasang iklan lahan Anda sekarang juga</p>
             <div class="cta-buttons">
-                <a href="{{ route('lahan.index') }}" class="primary-button">Cari Lahan</a>
-                <a href="{{ route('lahan.create') }}" class="secondary-button">Pasang Iklan</a>
+                <a href="{{ route('lahan.index') }}" class="primary-button" style="width: auto;">Cari Lahan</a>
+                <a href="{{ route('lahan.create') }}" class="secondary-button" style="width: auto;">Pasang Iklan</a>
             </div>
         </div>
     </section>
