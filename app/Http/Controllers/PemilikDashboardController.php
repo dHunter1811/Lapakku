@@ -1,46 +1,51 @@
 <?php
 
-namespace App\Http\Controllers; // Sesuaikan namespace jika Anda meletakkannya di subfolder Admin
+namespace App\Http\Controllers;
 
+use App\Models\Lahan; // 1. PASTIKAN MODEL LAHAN DI-IMPORT
 use App\Models\PengajuanSewa;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
 class PemilikDashboardController extends Controller
 {
-    // HAPUS ATAU KOMENTARI METHOD __construct() INI:
     /*
     public function __construct()
     {
-        $this->middleware('auth'); // Baris ini menyebabkan error dan tidak diperlukan
+        $this->middleware('auth'); // Sudah ditangani oleh middleware di route
     }
     */
 
     /**
-     * Menampilkan dashboard pemilik lahan dengan daftar pengajuan sewa.
+     * Menampilkan dashboard pemilik lahan dengan daftar pengajuan sewa dan lahan milik user.
      */
     public function index(Request $request)
     {
         $user = Auth::user();
 
-        // Pastikan user sudah login (sebenarnya sudah ditangani oleh middleware di route)
         if (!$user) {
             return redirect()->route('login');
         }
 
+        // 2. Ambil lahan milik pengguna yang sedang login
+        $lahanMilikUser = Lahan::where('user_id', $user->id)
+                              ->orderBy('created_at', 'desc') // Urutkan berdasarkan yang terbaru
+                              ->paginate(5, ['*'], 'lahan_page'); // Paginasi untuk lahan, nama parameter halaman 'lahan_page'
+
         // Ambil semua pengajuan sewa dimana pemilik_lahan_id adalah ID user yang login
-        $query = PengajuanSewa::where('pemilik_lahan_id', $user->id)
+        $queryPengajuan = PengajuanSewa::where('pemilik_lahan_id', $user->id)
                               ->with(['lahan', 'penyewa']) // Eager load lahan dan data penyewa
-                              ->orderBy('created_at', 'desc'); // Tampilkan yang terbaru dulu
+                              ->orderBy('created_at', 'desc');
 
         // Filter berdasarkan status pengajuan jika ada parameter di request
         if ($request->filled('status_pengajuan')) {
-            $query->where('status', $request->status_pengajuan);
+            $queryPengajuan->where('status', $request->status_pengajuan);
         }
 
-        $pengajuanMasuk = $query->paginate(10);
+        $pengajuanMasuk = $queryPengajuan->paginate(10, ['*'], 'pengajuan_page'); // Paginasi untuk pengajuan, nama parameter halaman 'pengajuan_page'
 
-        return view('pemilik.dashboard', compact('pengajuanMasuk', 'user'));
+        // 3. Kirim kedua data ke view
+        return view('pemilik.dashboard', compact('lahanMilikUser', 'pengajuanMasuk', 'user'));
     }
 
     /**
@@ -48,7 +53,6 @@ class PemilikDashboardController extends Controller
      */
     public function setujui(Request $request, PengajuanSewa $pengajuanSewa)
     {
-        // Otorisasi: Pastikan user yang login adalah pemilik lahan dari pengajuan ini
         if ($pengajuanSewa->pemilik_lahan_id !== Auth::id()) {
             return redirect()->route('pemilik.dashboard')->with('error', 'Anda tidak memiliki izin untuk aksi ini.');
         }
@@ -60,7 +64,8 @@ class PemilikDashboardController extends Controller
         $pengajuanSewa->status = 'Disetujui';
         $pengajuanSewa->save();
 
-        return redirect()->route('pemilik.dashboard')->with('success', 'Pengajuan sewa untuk lahan "' . $pengajuanSewa->lahan->judul . '" telah disetujui.');
+        // Menggunakan optional() untuk mencegah error jika relasi lahan tidak ada (mis. lahan terhapus)
+        return redirect()->route('pemilik.dashboard')->with('success', 'Pengajuan sewa untuk lahan "' . optional($pengajuanSewa->lahan)->judul . '" telah disetujui.');
     }
 
     /**
@@ -78,7 +83,7 @@ class PemilikDashboardController extends Controller
 
         $pengajuanSewa->status = 'Ditolak';
         $pengajuanSewa->save();
-
-        return redirect()->route('pemilik.dashboard')->with('success', 'Pengajuan sewa untuk lahan "' . $pengajuanSewa->lahan->judul . '" telah ditolak.');
+        
+        return redirect()->route('pemilik.dashboard')->with('success', 'Pengajuan sewa untuk lahan "' . optional($pengajuanSewa->lahan)->judul . '" telah ditolak.');
     }
 }
