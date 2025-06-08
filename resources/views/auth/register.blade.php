@@ -92,7 +92,7 @@
         <div class="register-branding-panel">
             <div class="branding-content">
                 <a href="{{ route('home') }}" class="logo-link-register">
-                    <img src="{{ asset('images/logo-lapakku.jpg') }}" alt="Lapakku Logo" class="logo-image-register">
+                    <img src="{{ asset('images/Jukung Lapakku.png') }}" alt="Lapakku Logo" class="logo-image-register">
                     <span>Lapakku</span>
                 </a>
                 <h1 class="branding-title">Satu Langkah Lagi Menuju Kesuksesan Usaha Anda.</h1>
@@ -132,7 +132,6 @@
 
     /* Panel Kanan (Branding) */
     .register-branding-panel {
-        background: url('https://images.unsplash.com/photo-1556742044-3c52d6e88c62?q=80&w=1770&auto=format&fit=crop') center center/cover; /* Gambar berbeda untuk register */
         color: white;
         padding: 40px;
         display: none; /* Sembunyikan di mobile */

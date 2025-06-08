@@ -368,7 +368,7 @@
     <header class="header-nav">
         <div class="container">
             <a href="{{ route('home') }}" class="logo-link">
-                <img src="{{ asset('images/logo-lapakku.jpg') }}" alt="Lapakku Logo" class="logo-image">
+                <img src="{{ asset('images/Jukung Lapakku.png') }}" alt="Lapakku Logo" class="logo-image">
                 <span class="logo-text">Lapakku</span>
             </a>
             <nav class="main-nav" style="display: flex; align-items: center;">

@@ -6,7 +6,7 @@
 <div class="container">
     <h1 style="color: #00695C; text-align:center; margin-bottom: 25px; margin-top: 20px; font-size:2em;">Temukan Lahan Impian Anda</h1>
 
-    <div class="card mb-4" style="padding: 20px 25px; background-color: #f8f9fa; border-radius: 8px;">
+    <div class="card mb-4 filter-card">
         <form action="{{ route('lahan.index') }}" method="GET" id="filterForm">
             <div class="filter-grid">
                 <div class="filter-group">
@@ -38,7 +38,7 @@
                     </select>
                 </div>
 
-                 <div class="filter-group">
+                <div class="filter-group">
                     <label for="sort_by" class="filter-label">Urutkan</label>
                     <select name="sort_by" id="sort_by" class="filter-control">
                         <option value="terbaru" {{ request('sort_by') == 'terbaru' ? 'selected' : '' }}>Terbaru</option>
@@ -47,7 +47,6 @@
                     </select>
                 </div>
 
-                {{-- Modifikasi di sini untuk tombol Filter dan Reset --}}
                 <div class="filter-group-button">
                     <button type="submit" class="btn btn-primary btn-filter">Filter</button>
                     <a href="{{ route('lahan.index') }}" class="btn btn-secondary btn-reset">Reset</a>
@@ -56,33 +55,61 @@
         </form>
     </div>
 
-    {{-- ... kode untuk menampilkan $lahanList ... --}}
+    <div class="search-results-info">
+        @if(isset($lahanList) && $lahanList->total() > 0)
+            <p>Menampilkan <strong>{{ $lahanList->firstItem() }}</strong>-<strong>{{ $lahanList->lastItem() }}</strong> dari <strong>{{ $lahanList->total() }}</strong> hasil ditemukan.</p>
+        @endif
+    </div>
+
     <div class="product-grid">
         @forelse ($lahanList ?? [] as $lahan)
             <div class="product-card">
-                 <a href="{{ route('lahan.show', $lahan) }}">
-                    <img src="{{ $lahan->gambar_utama ? Storage::url($lahan->gambar_utama) : 'https://via.placeholder.com/300x200.png?text=Lapakku' }}" alt="{{ $lahan->judul }}">
+                 <a href="{{ route('lahan.show', $lahan) }}" class="product-card-image-link">
+                    <img src="{{ $lahan->gambar_utama ? Storage::url($lahan->gambar_utama) : 'https://placehold.co/400x300/e2e8f0/94a3b8?text=Lapakku' }}" alt="{{ $lahan->judul }}">
                  </a>
                 <div class="product-card-content">
-                    <h3><a href="{{ route('lahan.show', $lahan) }}" style="text-decoration:none; color: #333;">{{ Str::limit($lahan->judul, 45) }}</a></h3>
-                    <div class="price">Rp {{ number_format($lahan->harga_sewa, 0, ',', '.') }} / bulan</div>
-                    <div class="location" style="font-size:0.85em; color:#555;">
-                        <span class="badge-tipe">{{ $lahan->tipe_lahan }}</span> - {{ $lahan->lokasi }}
+                    <div class="location">
+                        <span class="badge-tipe">{{ $lahan->tipe_lahan }}</span> {{ $lahan->lokasi }}
                     </div>
-                    <div class="time" style="font-size:0.8em; color:#777;">Tayang {{ $lahan->created_at->diffForHumans() }}</div>
-                     <a href="{{ route('lahan.show', $lahan) }}" class="btn btn-primary btn-sm" style="width:100%; text-align:center; margin-top:10px;">Lihat Detail</a>
+                    <h3><a href="{{ route('lahan.show', $lahan) }}">{{ Str::limit($lahan->judul, 45) }}</a></h3>
+                    <div class="price">Rp {{ number_format($lahan->harga_sewa, 0, ',', '.') }} / bulan</div>
+                    
+                    {{-- === BAGIAN RATING DITAMBAHKAN DI SINI === --}}
+                    <div class="rating">
+                        @if($lahan->ratings_count > 0)
+                            <span class="rating-stars">
+                                @for ($i = 1; $i <= 5; $i++)
+                                    @if ($i <= round($lahan->ratings_avg_rating))
+                                        ★ <!-- Bintang terisi -->
+                                    @else
+                                        ☆ <!-- Bintang kosong -->
+                                    @endif
+                                @endfor
+                            </span>
+                            <span class="rating-text">
+                                {{ number_format($lahan->ratings_avg_rating, 1) }} ({{ $lahan->ratings_count }} ulasan)
+                            </span>
+                        @else
+                            <span class="rating-text no-rating">Belum ada ulasan</span>
+                        @endif
+                    </div>
+                    {{-- ======================================= --}}
+
+                    <div class="time">Tayang {{ $lahan->created_at->diffForHumans() }}</div>
+                     <a href="{{ route('lahan.show', $lahan) }}" class="btn btn-primary btn-sm btn-detail">Lihat Detail</a>
                 </div>
             </div>
         @empty
-            <div style="grid-column: 1 / -1; text-align: center; padding: 40px;" class="card">
-                <p>Tidak ada lahan yang ditemukan sesuai kriteria Anda.</p>
-                <a href="{{ route('lahan.index') }}" class="btn btn-secondary">Lihat Semua Lahan</a>
+            <div class="empty-state-card">
+                <p><strong>Tidak ada lahan yang ditemukan.</strong></p>
+                <p>Coba ubah atau reset filter pencarian Anda.</p>
+                <a href="{{ route('lahan.index') }}" class="btn btn-secondary mt-3">Reset Filter</a>
             </div>
         @endforelse
     </div>
 
     @if(isset($lahanList) && $lahanList->hasPages())
-    <div style="margin-top: 30px; display: flex; justify-content: center;">
+    <div class="pagination-container">
         {{ $lahanList->appends(request()->query())->links('pagination::bootstrap-4') }}
     </div>
     @endif
@@ -91,79 +118,67 @@
 
 @push('styles')
 <style>
-    .filter-grid {
+    /* Styling untuk form filter */
+    .filter-card { padding: 20px 25px; background-color: #ffffff; border-radius: 8px; border: 1px solid #e2e8f0; }
+    .filter-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 18px; align-items: flex-end; }
+    .filter-label { display: block; margin-bottom: .4rem; font-size: 0.85em; color: #555; font-weight: 500; }
+    .filter-control { width: 100%; padding: .5rem .75rem; font-size: 0.95rem; border: 1px solid #ced4da; border-radius: 6px; box-sizing: border-box; }
+    .filter-group-button { display: flex; gap: 10px; }
+    .btn-filter, .btn-reset { flex-grow: 1; padding: .5rem .75rem; font-size: 0.95rem; color: white; border: none; border-radius: 6px; cursor: pointer; text-align: center; text-decoration: none; }
+    .btn-filter { background-color: #00796B; } .btn-filter:hover { background-color: #00695C; }
+    .btn-reset { background-color: #6c757d; } .btn-reset:hover { background-color: #5a6268; }
+    .search-results-info { margin-bottom: 20px; font-size: 0.95em; color: #64748b; }
+
+    /* === PERBAIKAN GRID CARD LAHAN === */
+    .product-grid {
         display: grid;
-        /* Membuat kolom terakhir (untuk tombol) memiliki lebar yang cukup untuk dua tombol jika perlu,
-           atau Anda bisa membuat kolom tombol ini span lebih dari satu kolom grid jika diperlukan.
-           Untuk auto-fit, kita bisa biarkan dan atur tombol di dalam filter-group-button dengan flexbox.
-        */
-        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-        gap: 15px;
-        align-items: flex-end;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); /* Ukuran kartu disesuaikan */
+        gap: 25px;
+        /* Hapus justify-content: center; agar rata kiri-kanan jika tidak penuh */
     }
+    .product-card {
+        border: 1px solid #e2e8f0; border-radius: 8px; overflow: hidden; background: white;
+        box-shadow: 0 4px 6px -1px rgba(0,0,0,0.07), 0 2px 4px -1px rgba(0,0,0,0.04);
+        display:flex; flex-direction:column;
+        transition: box-shadow 0.2s ease, transform 0.2s ease;
+    }
+    .product-card:hover {
+        box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -2px rgba(0,0,0,0.05);
+        transform: translateY(-3px);
+    }
+    /* ============================== */
 
-    .filter-label {
-        display: block;
-        margin-bottom: .3rem;
+    .product-card-image-link { display: block; }
+    .product-card img { width: 100%; height: 200px; object-fit: cover; }
+    .product-card-content { padding: 18px; flex-grow:1; display:flex; flex-direction:column; }
+    .product-card-content h3 { margin-top: 5px; font-size: 1.1em; margin-bottom: 10px; color:#334155; line-height:1.3; height:auto; min-height:44px; }
+    .product-card-content h3 a {text-decoration:none; color:inherit;}
+    .product-card-content .price { font-weight: 700; font-size:1.1em; color: #00796B; margin-bottom: 8px; }
+    .product-card-content .location { margin-bottom: 5px; font-size: 0.85em; color:#555; }
+    .badge-tipe { display: inline-block; padding: .3em .6em; font-size: 75%; font-weight: 600; line-height: 1; text-align: center; white-space: nowrap; vertical-align: baseline; border-radius: .25rem; background-color: #6c757d; color: white; }
+
+    /* === CSS BARU UNTUK RATING === */
+    .product-card-content .rating {
+        display: flex;
+        align-items: center;
+        gap: 5px;
         font-size: 0.9em;
-        color: #555;
-        font-weight: 500;
+        color: #64748b;
+        margin-bottom: 8px;
     }
+    .rating-stars {
+        color: #f59e0b; /* Warna kuning bintang */
+        font-size: 1.1em;
+        line-height: 1;
+    }
+    .rating-text.no-rating {
+        font-style: italic;
+    }
+    /* ============================ */
 
-    .filter-control {
-        width: 100%;
-        padding: .5rem .75rem;
-        font-size: 0.95rem;
-        border: 1px solid #ced4da;
-        border-radius: .25rem;
-        box-sizing: border-box;
-    }
-
-    .filter-group-button {
-        display: flex; /* Menggunakan flexbox untuk menata tombol */
-        gap: 10px; /* Jarak antara tombol Filter dan Reset */
-        /* Jika filter-grid membuat kolom ini terlalu sempit, Anda mungkin perlu:
-           grid-column: span 2; (jika Anda ingin kolom tombol ini mengambil 2 slot grid)
-           atau sesuaikan minmax pada grid-template-columns
-        */
-    }
-
-    .btn-filter, .btn-reset {
-        flex-grow: 1; /* Membuat kedua tombol berbagi ruang secara merata */
-        padding: .5rem .75rem;
-        font-size: 0.95rem;
-        color: white;
-        border: none;
-        border-radius: .25rem;
-        cursor: pointer;
-        text-align: center; /* Untuk tag <a> yang dijadikan tombol */
-        text-decoration: none; /* Untuk tag <a> */
-    }
-
-    .btn-filter {
-        background-color: #00796B;
-    }
-    .btn-filter:hover {
-        background-color: #00695C;
-    }
-
-    .btn-reset {
-        background-color: #6c757d; /* Warna abu-abu untuk reset */
-    }
-    .btn-reset:hover {
-        background-color: #5a6268;
-    }
-
-
-    /* Style lain yang sudah ada */
-    .product-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 20px; margin-top:30px; }
-    .product-card { border: 1px solid #eee; border-radius: 8px; overflow: hidden; background: white; box-shadow: 0 2px 5px rgba(0,0,0,0.07); }
-    .product-card img { width: 100%; height: 180px; object-fit: cover; }
-    .product-card-content { padding: 15px; }
-    .product-card-content h3 { margin-top: 0; font-size: 1.1em; margin-bottom: 8px; height: 40px; overflow:hidden; }
-    .product-card-content .price { font-weight: bold; color: #00796B; margin-bottom: 5px; }
-    .product-card-content .location { margin-bottom: 5px; }
-    .badge-tipe { display: inline-block; padding: .25em .6em; font-size: 75%; font-weight: 700; line-height: 1; text-align: center; white-space: nowrap; vertical-align: baseline; border-radius: .25rem; background-color: #6c757d; color: white; }
-    .form-group { margin-bottom: 1rem; }
+    .product-card-content .time { font-size: 0.8em; color: #777; margin-top: auto; padding-top: 10px; }
+    .product-card-content .btn-detail { width:100%; text-align:center; margin-top:12px; font-size:0.9em; padding: 8px 10px;}
+    .empty-state-card { grid-column: 1 / -1; text-align: center; padding: 40px; background-color: #f8fafc; border: 1px dashed #d1d5db; border-radius: 8px; }
+    .pagination-container { margin-top: 30px; display: flex; justify-content: center; }
 </style>
 @endpush

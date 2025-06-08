@@ -10,12 +10,21 @@ use Illuminate\Support\Facades\Storage;
 
 class LahanController extends Controller
 {
-    // ... (method index, create, show, edit, destroy Anda yang sudah ada) ...
     public function index(Request $request)
     {
-        $query = Lahan::query()->where('status', 'Disetujui');
-        if ($request->filled('tipe_lahan')) { $query->where('tipe_lahan', $request->tipe_lahan); }
-        if ($request->filled('lokasi')) { $query->where('lokasi', $request->lokasi); }
+        // === PERUBAHAN DI SINI: Tambahkan withCount dan withAvg ===
+        $query = Lahan::query()
+            ->withCount('ratings') // Menghitung jumlah rating, hasilnya di kolom 'ratings_count'
+            ->withAvg('ratings', 'rating') // Menghitung rata-rata, hasilnya di 'ratings_avg_rating'
+            ->where('status', 'Disetujui');
+        // ========================================================
+
+        if ($request->filled('tipe_lahan')) {
+            $query->where('tipe_lahan', $request->tipe_lahan);
+        }
+        if ($request->filled('lokasi')) {
+            $query->where('lokasi', $request->lokasi);
+        }
         if ($request->filled('search')) {
             $searchTerm = $request->search;
             $query->where(function ($q) use ($searchTerm) {
@@ -24,13 +33,22 @@ class LahanController extends Controller
                   ->orWhere('deskripsi', 'like', '%' . $searchTerm . '%');
             });
         }
+        
         $sortBy = $request->input('sort_by', 'terbaru');
         switch ($sortBy) {
-            case 'termurah': $query->orderBy('harga_sewa', 'asc'); break;
-            case 'termahal': $query->orderBy('harga_sewa', 'desc'); break;
-            default: $query->latest(); break;
+            case 'termurah':
+                $query->orderBy('harga_sewa', 'asc');
+                break;
+            case 'termahal':
+                $query->orderBy('harga_sewa', 'desc');
+                break;
+            case 'terbaru':
+            default:
+                $query->latest();
+                break;
         }
-        $lahanList = $query->paginate(9);
+
+        $lahanList = $query->paginate(12); // Diubah menjadi 12 agar pas untuk grid
         return view('lahan.index', compact('lahanList'));
     }
 
@@ -48,7 +66,7 @@ class LahanController extends Controller
             'lokasi' => 'required|string|in:Banjarmasin Selatan,Banjarmasin Timur,Banjarmasin Barat,Banjarmasin Tengah,Banjarmasin Utara',
             'harga_sewa' => 'required|numeric|min:1',
             'alamat_lengkap' => 'required|string',
-            'no_whatsapp' => ['nullable', 'string', 'regex:/^([0-9\s\-\+\(\)]*)$/', 'min:10', 'max:20'], // === VALIDASI DITAMBAHKAN ===
+            'no_whatsapp' => ['nullable', 'string', 'regex:/^([0-9\s\-\+\(\)]*)$/', 'min:10', 'max:20'],
             'keuntungan_lokasi' => 'nullable|array',
             'keuntungan_lokasi.*' => 'nullable|string|max:255',
             'latitude' => ['nullable', 'regex:/^[-]?(([0-8]?[0-9])\.(\d+)|90(\.0+)?)$/'],
@@ -60,15 +78,14 @@ class LahanController extends Controller
         ]);
 
         if ($validator->fails()) {
-            return redirect()->route('lahan.create') // Gunakan route yang sesuai (create atau buat)
+            return redirect()->route('lahan.create')
                         ->withErrors($validator)
                         ->withInput();
         }
 
         $dataToCreate = $request->only([
             'judul', 'deskripsi', 'tipe_lahan', 'lokasi', 'harga_sewa', 'alamat_lengkap',
-            'latitude', 'longitude',
-            'no_whatsapp' // === FIELD DIAMBIL DARI REQUEST ===
+            'latitude', 'longitude', 'no_whatsapp'
         ]);
         $dataToCreate['user_id'] = Auth::id();
         $dataToCreate['status'] = 'Menunggu';
@@ -122,7 +139,7 @@ class LahanController extends Controller
             'lokasi' => 'required|string|in:Banjarmasin Selatan,Banjarmasin Timur,Banjarmasin Barat,Banjarmasin Tengah,Banjarmasin Utara',
             'harga_sewa' => 'required|numeric|min:1',
             'alamat_lengkap' => 'required|string',
-            'no_whatsapp' => ['nullable', 'string', 'regex:/^([0-9\s\-\+\(\)]*)$/', 'min:10', 'max:20'], // === VALIDASI DITAMBAHKAN ===
+            'no_whatsapp' => ['nullable', 'string', 'regex:/^([0-9\s\-\+\(\)]*)$/', 'min:10', 'max:20'],
             'keuntungan_lokasi' => 'nullable|array',
             'keuntungan_lokasi.*' => 'nullable|string|max:255',
             'latitude' => ['nullable', 'regex:/^[-]?(([0-8]?[0-9])\.(\d+)|90(\.0+)?)$/'],
@@ -134,19 +151,18 @@ class LahanController extends Controller
         ]);
 
         if ($validator->fails()) {
-            return redirect()->route('lahan.edit', $lahan->id)
-                        ->withErrors($validator)
-                        ->withInput();
+            return redirect()->route('lahan.edit', $lahan->id)->withErrors($validator)->withInput();
         }
 
         $dataToUpdate = $request->only([
-            'judul', 'deskripsi', 'tipe_lahan', 'lokasi',
-            'harga_sewa', 'alamat_lengkap',
-            'latitude', 'longitude',
-            'no_whatsapp' // === FIELD DIAMBIL DARI REQUEST ===
+            'judul', 'deskripsi', 'tipe_lahan', 'lokasi', 'harga_sewa', 'alamat_lengkap',
+            'latitude', 'longitude', 'no_whatsapp'
         ]);
+        
+        if (optional(Auth::user())->role !== 'admin' && $lahan->status !== 'Disetujui') {
+             $dataToUpdate['status'] = 'Menunggu';
+        }
 
-        // ... (sisa logika update Anda) ...
         if ($request->has('keuntungan_lokasi')) {
             $keuntungan = array_filter($request->keuntungan_lokasi, fn($value) => !is_null($value) && $value !== '');
             $dataToUpdate['keuntungan_lokasi'] = !empty($keuntungan) ? array_values($keuntungan) : null;
@@ -160,7 +176,6 @@ class LahanController extends Controller
             }
             $dataToUpdate['gambar_utama'] = $request->file('gambar_utama')->store('lahan_images/utama', 'public');
         }
-
         for ($i = 1; $i <= 3; $i++) {
             $galeriField = 'galeri_' . $i;
             if ($request->hasFile($galeriField)) {
@@ -170,7 +185,6 @@ class LahanController extends Controller
                 $dataToUpdate[$galeriField] = $request->file($galeriField)->store('lahan_images/galeri', 'public');
             }
         }
-        
         $lahan->update($dataToUpdate);
         return redirect()->route('lahan.show', $lahan->id)->with('success', 'Lahan berhasil diperbarui.');
     }

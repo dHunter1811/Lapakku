@@ -9,7 +9,7 @@
         <div class="login-branding-panel">
             <div class="branding-content">
                 <a href="{{ route('home') }}" class="logo-link-login">
-                    <img src="{{ asset('images/logo-lapakku.jpg') }}" alt="Lapakku Logo" class="logo-image-login">
+                    <img src="{{ asset('images/Jukung Lapakku.png') }}" alt="Lapakku Logo" class="logo-image-login">
                     <span>Lapakku</span>
                 </a>
                 <h1 class="branding-title">Temukan Peluang Usaha Anda.</h1>
@@ -95,7 +95,6 @@
 
     /* Panel Kiri (Branding) */
     .login-branding-panel {
-        background: url('https://images.unsplash.com/photo-1600880292203-942bb68b2432?q=80&w=1887&auto=format&fit=crop') center center/cover;
         color: white;
         padding: 40px;
         display: flex;
