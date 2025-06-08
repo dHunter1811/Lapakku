@@ -74,8 +74,8 @@ class LahanSeeder extends Seeder
             'harga_sewa' => 2500000,
             'alamat_lengkap' => 'Area Siring Menara Pandang, Jl. Kapten Piere Tendean, Banjarmasin Tengah',
             'no_whatsapp' => '087815001122',
-            'latitude' => -3.319500,
-            'longitude' => 114.590500,
+            'latitude' => -3.3268000,
+            'longitude' => 114.5913000,
             'keuntungan_lokasi' => [
                 'Ikon wisata Kota Banjarmasin.',
                 'Target pasar anak muda dan keluarga.',
@@ -85,6 +85,7 @@ class LahanSeeder extends Seeder
             'gambar_utama' => 'lahan_images/utama/siring1.jpg',
             'galeri_1' => 'lahan_images/galeri/siring_galeri1.jpg',
             'galeri_2' => 'lahan_images/galeri/siring_galeri2.jpg',
+            'galeri_3' => 'lahan_images/galeri/siring_galeri3.jpg',
             'status' => 'Disetujui',
         ]);
 
