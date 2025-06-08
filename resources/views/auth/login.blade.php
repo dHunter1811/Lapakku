@@ -39,7 +39,7 @@
             </div>
 
             <div class="text-center mt-3">
-                <a href="{{ route('register') }}" class="btn btn-light" style="width:100%; margin-bottom:10px;">Belum punya akun? Register</a>
+                <a href="{{ route('register') }}" class="btn btn-light" style="width:92%; margin-bottom:10px;">Belum punya akun? Register</a>
                 @if (Route::has('password.request'))
                     <a href="{{-- route('password.request') --}}" style="color: #00695C; display: block;">Lupa Password?</a>
                 @endif
