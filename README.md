@@ -14,7 +14,7 @@ Berikut adalah beberapa tampilan dari antarmuka website Lapakku:
 
 | Halaman Utama | Halaman Detail Lahan | Dashboard Admin |
 | :---: | :---: | :---: |
-| ![Tampilan Halaman Utama Lapakku](https://storage.googleapis.com/gemini-prod/images/1544a0de-db38-4e8f-b98a-7852c00a6e60) | ![Tampilan Halaman Detail Lahan](https://storage.googleapis.com/gemini-prod/images/5176b6b7-873b-4835-b6d9-ab717b447814) | ![Tampilan Dashboard Admin](https://storage.googleapis.com/gemini-prod/images/3cbfa25b-d433-4fd1-bd69-283b05313f62) |
+| ![Tampilan Halaman Utama Lapakku](<public/images/README/Halaman Home.png>) | ![Tampilan Halaman Detail Lahan](<public/images/README/Halaman Detail Lahan.png>) | ![Tampilan Dashboard Admin](<public/images/README/Dashboard Admin.png>) |
 
 ---
 
@@ -121,14 +121,14 @@ Berikut adalah langkah-langkah untuk menjalankan proyek ini di lingkungan lokal 
 Proyek "Lapakku" ini dikembangkan dengan penuh dedikasi dan semangat kolaborasi oleh tim mahasiswa dari **Universitas Lambung Mangkurat, Fakultas Keguruan dan Ilmu Pendidikan, Program Studi Pendidikan Komputer**.
 
 * **Muhammad Dimas Aditya**
-    * [![GitHub](https://img.shields.io/badge/GitHub-181717?style=for-the-badge&logo=github&logoColor=white)](https://github.com/username_dimas)
-    * [![Instagram](https://img.shields.io/badge/Instagram-E4405F?style=for-the-badge&logo=instagram&logoColor=white)](https://instagram.com/username_dimas)
+    * [![GitHub](https://img.shields.io/badge/GitHub-181717?style=for-the-badge&logo=github&logoColor=white)](https://github.com/dHunter1811)
+    * [![Instagram](https://img.shields.io/badge/Instagram-E4405F?style=for-the-badge&logo=instagram&logoColor=white)](https://www.instagram.com/dimas_1811?igsh=NzNlandzcjBhbmlv)
 * **Muhammad Farros Shofiy**
-    * [![GitHub](https://img.shields.io/badge/GitHub-181717?style=for-the-badge&logo=github&logoColor=white)](https://github.com/username_farros)
-    * [![Instagram](https://img.shields.io/badge/Instagram-E4405F?style=for-the-badge&logo=instagram&logoColor=white)](https://instagram.com/username_farros)
+    * [![GitHub](https://img.shields.io/badge/GitHub-181717?style=for-the-badge&logo=github&logoColor=white)](https://github.com/KizuAnee)
+    * [![Instagram](https://img.shields.io/badge/Instagram-E4405F?style=for-the-badge&logo=instagram&logoColor=white)](https://www.instagram.com/banwave10thperiod?igsh=MTlvbWE1NGIyZ2FyZg==)
 * **Akhmad Rizky Rahmatullah**
-    * [![GitHub](https://img.shields.io/badge/GitHub-181717?style=for-the-badge&logo=github&logoColor=white)](https://github.com/username_rizky)
-    * [![Instagram](https://img.shields.io/badge/Instagram-E4405F?style=for-the-badge&logo=instagram&logoColor=white)](https://instagram.com/username_rizky)
+    * [![GitHub](https://img.shields.io/badge/GitHub-181717?style=for-the-badge&logo=github&logoColor=white)](https://github.com/omogiri)
+    * [![Instagram](https://img.shields.io/badge/Instagram-E4405F?style=for-the-badge&logo=instagram&logoColor=white)](https://www.instagram.com/rizkl_?igsh=MWgyM3ptcmFrN2NrYQ==)
 
 ---
 
