@@ -200,8 +200,10 @@
 @endsection
 
 @push('styles')
-{{-- ... (style Anda yang sudah ada) ... --}}
+{{-- Menambahkan link CDN untuk Bootstrap 5 CSS --}}
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" xintegrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
 <style>
+    /* ... (CSS Anda yang sudah ada dari respons sebelumnya) ... */
     .dashboard-pemilik-container { padding-top: 10px; padding-bottom: 30px; }
     .dashboard-pemilik-card .card-header.dashboard-header {
         background-color: #00695C; color: white; padding: 20px 25px;
@@ -210,12 +212,13 @@
     }
     .dashboard-title { margin:0; font-size: 1.6em; font-weight: 600; }
     .dashboard-subtitle { margin: 4px 0 0; font-size: 0.9em; opacity: 0.9; }
-    .dashboard-header .dashboard-action-button { /* Class baru untuk tombol di header */
-        font-size: 0.9em; padding: 8px 15px;
-    }
+    .dashboard-header .dashboard-action-button { font-size: 0.9em; padding: 8px 15px; font-weight:500; }
     .dashboard-header .dashboard-action-button .icon { margin-right: 5px; }
 
+    .card-body { padding: 25px; }
+
     .dashboard-section { margin-bottom: 35px; }
+    .dashboard-section:last-child { margin-bottom: 0; }
     .dashboard-section-header {
         display: flex; justify-content: space-between; align-items: center;
         margin-bottom: 15px; padding-bottom: 10px; border-bottom: 1px solid #e9ecef;
@@ -233,11 +236,11 @@
         border-bottom-width: 2px;
     }
     .table-dashboard tbody td { padding: 10px 12px; vertical-align: middle; color: #4b5563; }
-    .table-dashboard.table-lahan-saya tbody td { padding: 8px 12px; }
+    .table-lahan-saya tbody td { padding: 8px 12px; }
     .table-dashboard tbody tr:hover { background-color: #f1f5f9; }
     .table-link-lahan { color: #00796B; font-weight: 500; text-decoration: none; }
     .table-link-lahan:hover { text-decoration: underline; color: #004d40; }
-    .table-thumbnail-inline { width: 50px; height: 30px; object-fit: cover; border-radius: 3px; margin-left: 8px; vertical-align: middle; border: 1px solid #eee;}
+    .table-thumbnail-inline { width: 60px; height: 40px; object-fit: cover; border-radius: 4px; margin-left: 10px; vertical-align: middle; border: 1px solid #ddd;}
     .text-muted-light { color: #6c757d; }
     .font-weight-bold { font-weight: 600 !important; }
 
@@ -254,21 +257,45 @@
     .empty-state { border: 1px dashed #d1d5db; background-color: #f9fafb; padding: 30px; }
     .empty-state .btn-sm { font-size:0.9em; padding: 8px 15px; }
     hr.dashboard-divider { margin: 35px 0; border-top: 1px solid #e0e0e0; }
-    .modal { display: none; position: fixed; z-index: 1050; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(0,0,0,0.6); }
-    .modal-dialog { position: relative; margin: .5rem auto; pointer-events: none; max-width: 500px; }
-    @media (min-width: 576px) { .modal-dialog { max-width: 500px; margin: 1.75rem auto; } }
-    .modal-content { position: relative; display: flex; flex-direction: column; width: 100%; pointer-events: auto; background-color: #fff; background-clip: padding-box; border: 1px solid rgba(0,0,0,.2); border-radius: .3rem; outline: 0; animation-name: animatetop; animation-duration: 0.4s }
-    @keyframes animatetop { from {top: -300px; opacity: 0} to {top: 0; opacity: 1} }
-    .modal-header { display: flex; align-items: flex-start; justify-content: space-between; padding: 1rem 1rem; border-bottom: 1px solid #dee2e6; border-top-left-radius: calc(.3rem - 1px); border-top-right-radius: calc(.3rem - 1px); }
-    .modal-title { margin-bottom: 0; line-height: 1.5; font-size: 1.25rem; }
-    .modal-body { position: relative; flex: 1 1 auto; padding: 1rem; }
-    .modal-footer { display: flex; flex-wrap: wrap; align-items: center; justify-content: flex-end; padding: .75rem; border-top: 1px solid #dee2e6; border-bottom-right-radius: calc(.3rem - 1px); border-bottom-left-radius: calc(.3rem - 1px); }
-    .modal-footer > :not(:first-child) { margin-left: .25rem; }
-    .modal-footer > :not(:last-child) { margin-right: .25rem; }
-    .close-button { padding: 1rem 1rem; margin: -1rem -1rem -1rem auto; background-color: transparent; border: 0; font-size: 1.5rem; font-weight: 700; line-height: 1; color: #000; text-shadow: 0 1px 0 #fff; opacity: .5; }
-    .close-button:hover { opacity: .75; }
-    .text-success { color: #198754 !important; }
-    .text-danger { color: #dc3545 !important; }
+
+    .pagination-container { margin-top: 25px; display:flex; justify-content:center; }
+    /* === PERBAIKAN UNTUK PAGINASI === */
+    /* Pastikan .pagination dari Bootstrap bisa di-override jika perlu */
+    .pagination {
+        display: flex;
+        padding-left: 0;
+        list-style: none;
+    }
+    .page-link {
+        position: relative;
+        display: block;
+        padding: .5rem .75rem;
+        margin-left: -1px;
+        line-height: 1.25;
+        color: #00796B; /* Warna link paginasi sesuai tema */
+        background-color: #fff;
+        border: 1px solid #dee2e6;
+    }
+    .page-link:hover {
+        z-index: 2;
+        color: #004d40;
+        text-decoration: none;
+        background-color: #e9ecef;
+        border-color: #dee2e6;
+    }
+    .page-item.active .page-link {
+        z-index: 3;
+        color: #fff;
+        background-color: #00796B; /* Warna background link aktif */
+        border-color: #00796B;
+    }
+    .page-item.disabled .page-link {
+        color: #6c757d;
+        pointer-events: none;
+        background-color: #fff;
+        border-color: #dee2e6;
+    }
+    /* ============================== */
 </style>
 @endpush
 
