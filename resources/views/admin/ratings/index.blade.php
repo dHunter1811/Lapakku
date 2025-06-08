@@ -7,6 +7,15 @@
 <div class="card">
     <div class="card-header">
         <h4 style="margin:0; font-size: 1.2em; font-weight: 600;">Semua Rating dan Ulasan Pengguna</h4>
+        {{-- === TOMBOL EKSPOR DITAMBAHKAN DI SINI === --}}
+        <div class="export-buttons">
+            <a href="{{ route('admin.ratings.export', array_merge(request()->query(), ['format' => 'xlsx'])) }}" class="btn btn-success btn-sm">
+                <span class="icon">📄</span> Ekspor ke Excel
+            </a>
+            <a href="{{ route('admin.ratings.export', array_merge(request()->query(), ['format' => 'pdf'])) }}" class="btn btn-danger btn-sm">
+                <span class="icon">📕</span> Ekspor ke PDF
+            </a>
+        </div>
     </div>
     <div class="card-body">
         <form method="GET" action="{{ route('admin.ratings.index') }}" class="filter-form mb-4">
@@ -20,7 +29,6 @@
                     <input type="text" name="search_user" id="search_user" class="form-control form-control-sm" value="{{ request('search_user') }}" placeholder="Nama atau email user...">
                 </div>
                 <div class="filter-group">
-                    {{-- Mengganti filter Min. Rating menjadi Rating Tepat --}}
                     <label for="exact_rating" class="form-label">Rating Bintang</label>
                     <select name="exact_rating" id="exact_rating" class="form-select form-select-sm">
                         <option value="">Semua Rating</option>
@@ -35,7 +43,7 @@
                     <label for="sort_by" class="form-label">Urutkan</label>
                     <select name="sort_by" id="sort_by" class="form-select form-select-sm">
                         <option value="terbaru" {{ request('sort_by', 'terbaru') == 'terbaru' ? 'selected' : '' }}>Terbaru</option>
-                        <option value="terlama" {{ request('sort_by', 'terlama') == 'terlama' ? 'selected' : '' }}>Terlama</option>
+                        <option value="terlama" {{ request('sort_by') == 'terlama' ? 'selected' : '' }}>Terlama</option>
                         <option value="rating_tinggi" {{ request('sort_by') == 'rating_tinggi' ? 'selected' : '' }}>Rating Tertinggi</option>
                         <option value="rating_rendah" {{ request('sort_by') == 'rating_rendah' ? 'selected' : '' }}>Rating Terendah</option>
                     </select>
@@ -92,7 +100,7 @@
                         <td>{{ $rating->created_at->format('d M Y') }}<br><small class="text-muted">{{$rating->created_at->format('H:i')}}</small></td>
                         <td>
                             <div class="action-buttons">
-                                {{-- <a href="#" class="btn btn-info btn-sm" title="Lihat Detail Komentar">👁️</a> --}}
+                                {{-- Tombol lihat detail komentar bisa ditambahkan di sini jika perlu --}}
                                 <form action="{{ route('admin.ratings.destroy', $rating->id) }}" method="POST" class="d-inline" onsubmit="return confirm('Anda yakin ingin menghapus rating ini?')">
                                     @csrf
                                     @method('DELETE')
@@ -120,7 +128,12 @@
 
 @push('styles')
 <style>
-    /* Style dari admin/lahan/index.blade.php bisa digunakan di sini atau di layout admin */
+    /* Mengambil style dari layout admin yang relevan */
+    .card-header { display: flex; justify-content: space-between; align-items: center; } /* Memastikan judul dan tombol sejajar */
+    .export-buttons { display: flex; gap: 10px; }
+    .export-buttons .btn-sm { font-size: 0.85em; padding: 8px 12px; }
+    .export-buttons .btn-sm .icon { margin-right: 5px; }
+
     .form-label { font-size: 0.875em; margin-bottom: 0.3rem; color: #4b5563; font-weight: 500; }
     .form-control-sm, .form-select-sm { font-size: 0.9rem; border-radius: 0.3rem; }
     .filter-form .filter-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; align-items: flex-end; }
@@ -128,13 +141,13 @@
     .filter-form .filter-buttons { display: flex; gap: 10px; }
     .filter-form .filter-buttons .btn { flex-grow: 1; }
 
-    .admin-table { border: 1px solid #e5e7eb; }
     .admin-table th { background-color: #f9fafb; color: #374151; font-weight: 600; font-size: 0.9em; text-transform: uppercase; letter-spacing: 0.5px; }
-    .admin-table td { font-size: 0.9em; color: #4b5563; }
+    .admin-table td { font-size: 0.9em; color: #4b5563; vertical-align: middle; }
+    .admin-table tbody tr:hover { background-color: #f1f5f9; }
     .table-link { color: #1d4ed8; font-weight: 500; text-decoration: none; }
     .table-link:hover { text-decoration: underline; }
     .text-muted { color: #6b7280 !important; }
-    .action-buttons { display: flex; gap: 5px; align-items: center; }
+    .action-buttons { display: flex; gap: 5px; align-items: center; justify-content: center; }
     .action-buttons .btn-sm { padding: 0.3rem 0.6rem; display: inline-flex; align-items: center; justify-content: center; }
     .action-buttons .icon { margin-right: 0; font-size: 1em; }
     .d-inline { display: inline-block !important; }

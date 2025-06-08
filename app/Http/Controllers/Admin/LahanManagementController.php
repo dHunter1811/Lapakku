@@ -1,26 +1,25 @@
 <?php
 
-namespace App\Http\Controllers\Admin; // Pastikan namespace benar
+namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Lahan;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
-use Illuminate\Support\Facades\Storage; // Pastikan Storage di-import untuk menghapus gambar
+use Illuminate\Support\Facades\Storage;
+// --- Import untuk Ekspor ---
+use Maatwebsite\Excel\Facades\Excel;
+use App\Exports\LahanExport;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 class LahanManagementController extends Controller
 {
-    // Jika Anda ingin semua method di controller ini dilindungi oleh middleware admin,
-    // Anda bisa mengaktifkan __construct() ini.
-    // public function __construct()
-    // {
-    //     $this->middleware('admin');
-    // }
-
     /**
-     * Menampilkan daftar semua lahan untuk manajemen admin.
+     * Method privat untuk membangun query filter lahan agar bisa dipakai ulang.
+     * @param Request $request
+     * @return \Illuminate\Database\Eloquent\Builder
      */
-    public function index(Request $request)
+    private function getLahanQuery(Request $request)
     {
         $query = Lahan::query()->with('user'); // Eager load relasi user (pemilik)
 
@@ -55,13 +54,39 @@ class LahanManagementController extends Controller
                 break;
             case 'terbaru':
             default:
-                $query->orderBy('created_at', 'desc'); // atau $query->latest();
+                $query->orderBy('created_at', 'desc');
                 break;
         }
+        return $query;
+    }
 
-        $lahanList = $query->paginate(10); // Ambil 10 data per halaman, sesuaikan jika perlu
-
+    /**
+     * Menampilkan daftar semua lahan untuk manajemen admin.
+     */
+    public function index(Request $request)
+    {
+        $query = $this->getLahanQuery($request);
+        $lahanList = $query->paginate(10);
         return view('admin.lahan.index', compact('lahanList'));
+    }
+
+    /**
+     * Menangani ekspor data lahan ke Excel atau PDF.
+     */
+    public function export(Request $request, $format)
+    {
+        $query = $this->getLahanQuery($request); // Menggunakan query yang sudah difilter
+        $filename = 'laporan-data-lahan-' . date('Y-m-d') . '.' . $format;
+
+        if ($format === 'xlsx') {
+            return Excel::download(new LahanExport($query), $filename);
+        } elseif ($format === 'pdf') {
+            $data = $query->get(); // Ambil semua data yang cocok untuk PDF
+            $pdf = Pdf::loadView('admin.lahan.pdf', compact('data'));
+            return $pdf->download($filename);
+        }
+        
+        return redirect()->back()->with('error', 'Format ekspor tidak didukung.');
     }
 
     /**
@@ -69,7 +94,7 @@ class LahanManagementController extends Controller
      */
     public function edit(Lahan $lahan)
     {
-        $lahan->load('user'); // Eager load user untuk ditampilkan di form edit
+        $lahan->load('user');
         return view('admin.lahan.edit', compact('lahan'));
     }
 
@@ -78,8 +103,6 @@ class LahanManagementController extends Controller
      */
     public function update(Request $request, Lahan $lahan)
     {
-        // Otorisasi sudah ditangani oleh middleware di route, tidak perlu pengecekan Auth di sini
-        
         $validator = Validator::make($request->all(), [
             'judul' => 'required|string|max:255',
             'deskripsi' => 'required|string',
@@ -87,7 +110,7 @@ class LahanManagementController extends Controller
             'lokasi' => 'required|string|in:Banjarmasin Selatan,Banjarmasin Timur,Banjarmasin Barat,Banjarmasin Tengah,Banjarmasin Utara',
             'harga_sewa' => 'required|numeric|min:1',
             'alamat_lengkap' => 'required|string',
-            'no_whatsapp' => ['nullable', 'string', 'regex:/^([0-9\s\-\+\(\)]*)$/', 'min:10', 'max:20'], // === VALIDASI DITAMBAHKAN ===
+            'no_whatsapp' => ['nullable', 'string', 'regex:/^([0-9\s\-\+\(\)]*)$/', 'min:10', 'max:20'],
             'keuntungan_lokasi' => 'nullable|array',
             'keuntungan_lokasi.*' => 'nullable|string|max:255',
             'latitude' => ['nullable', 'regex:/^[-]?(([0-8]?[0-9])\.(\d+)|90(\.0+)?)$/'],
@@ -105,22 +128,18 @@ class LahanManagementController extends Controller
                         ->withInput();
         }
 
-        // Ambil semua field yang relevan dari request
         $dataToUpdate = $request->only([
             'judul', 'deskripsi', 'tipe_lahan', 'lokasi', 'harga_sewa', 'alamat_lengkap', 'status',
-            'latitude', 'longitude',
-            'no_whatsapp' // === FIELD DIAMBIL DARI REQUEST ===
+            'latitude', 'longitude', 'no_whatsapp'
         ]);
 
-        // Proses Keuntungan Lokasi
         if ($request->has('keuntungan_lokasi')) {
             $keuntungan = array_filter($request->keuntungan_lokasi, fn($value) => !is_null($value) && $value !== '');
             $dataToUpdate['keuntungan_lokasi'] = !empty($keuntungan) ? array_values($keuntungan) : null;
         } else {
-            $dataToUpdate['keuntungan_lokasi'] = null; // Kosongkan jika tidak ada input
+            $dataToUpdate['keuntungan_lokasi'] = null;
         }
 
-        // Proses Gambar Utama
         if ($request->hasFile('gambar_utama')) {
             if ($lahan->gambar_utama && Storage::disk('public')->exists($lahan->gambar_utama)) {
                 Storage::disk('public')->delete($lahan->gambar_utama);
@@ -128,7 +147,6 @@ class LahanManagementController extends Controller
             $dataToUpdate['gambar_utama'] = $request->file('gambar_utama')->store('lahan_images/utama', 'public');
         }
 
-        // Proses Gambar Galeri
         for ($i = 1; $i <= 3; $i++) {
             $galeriField = 'galeri_' . $i;
             if ($request->hasFile($galeriField)) {
@@ -144,41 +162,29 @@ class LahanManagementController extends Controller
         return redirect()->route('admin.lahan.index')->with('success', 'Data lahan berhasil diperbarui.');
     }
 
-    /**
-     * Menyetujui listing lahan.
-     */
     public function approve(Lahan $lahan)
     {
         $lahan->update(['status' => 'Disetujui']);
         return redirect()->back()->with('success', 'Lahan "' . $lahan->judul . '" berhasil disetujui.');
     }
 
-    /**
-     * Menolak listing lahan.
-     */
     public function reject(Lahan $lahan)
     {
         $lahan->update(['status' => 'Ditolak']);
         return redirect()->back()->with('success', 'Lahan "' . $lahan->judul . '" berhasil ditolak.');
     }
 
-    /**
-     * Menghapus lahan oleh admin.
-     */
     public function destroy(Lahan $lahan)
     {
-        // Hapus Gambar Utama
         if ($lahan->gambar_utama && Storage::disk('public')->exists($lahan->gambar_utama)) {
             Storage::disk('public')->delete($lahan->gambar_utama);
         }
-        // Hapus Gambar Galeri
         for ($i = 1; $i <= 3; $i++) {
             $galeriField = 'galeri_' . $i;
             if ($lahan->$galeriField && Storage::disk('public')->exists($lahan->$galeriField)) {
                 Storage::disk('public')->delete($lahan->$galeriField);
             }
         }
-
         $lahan->delete();
         return redirect()->route('admin.lahan.index')->with('success', 'Lahan "' . $lahan->judul . '" berhasil dihapus permanen.');
     }

@@ -6,13 +6,21 @@
 @section('content')
 <div class="card">
     <div class="card-header">
-        <div style="display: flex; justify-content: space-between; align-items: center;">
-            <h4 style="margin:0; font-size: 1.2em; font-weight: 600;">Daftar Semua Lahan</h4>
-            {{-- Jika Anda ingin tombol tambah lahan baru oleh admin --}}
-            {{-- <a href="{{ route('admin.lahan.create') }}" class="btn btn-primary btn-sm">
-                <span class="icon">➕</span> Tambah Lahan Baru
-            </a> --}}
+        <h4 style="margin:0; font-size: 1.2em; font-weight: 600;">Daftar Semua Lahan</h4>
+        
+        {{-- === TOMBOL EKSPOR DITAMBAHKAN DI SINI === --}}
+        <div class="export-buttons">
+            {{-- Tombol ini akan mengarahkan ke route export dengan format 'xlsx' --}}
+            {{-- array_merge akan menggabungkan filter yang sedang aktif dengan parameter format --}}
+            <a href="{{ route('admin.lahan.export', array_merge(request()->query(), ['format' => 'xlsx'])) }}" class="btn btn-success btn-sm">
+                <span class="icon">📄</span> Ekspor ke Excel
+            </a>
+            <a href="{{ route('admin.lahan.export', array_merge(request()->query(), ['format' => 'pdf'])) }}" class="btn btn-danger btn-sm">
+                <span class="icon">📕</span> Ekspor ke PDF
+            </a>
         </div>
+        {{-- ====================================== --}}
+
     </div>
     <div class="card-body">
         {{-- Filter Form --}}
@@ -147,21 +155,22 @@
 
 @push('styles')
 <style>
+    /* ... (Style Anda yang sudah ada dari admin.blade.php atau style sebelumnya) ... */
     .form-label {
         font-size: 0.875em;
         margin-bottom: 0.3rem;
-        color: #4b5563; /* Warna label lebih lembut */
+        color: #4b5563;
         font-weight: 500;
     }
-    .form-control-sm, .form-select-sm { /* Style dari layout admin sudah cukup baik */
+    .form-control-sm, .form-select-sm {
         font-size: 0.9rem;
-        border-radius: 0.3rem; /* Sedikit lebih bulat */
+        border-radius: 0.3rem;
     }
     .filter-form .filter-grid {
         display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); /* Kolom responsif */
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
         gap: 15px;
-        align-items: flex-end; /* Sejajarkan elemen di bagian bawah */
+        align-items: flex-end;
     }
     .filter-form .filter-group {
         display: flex;
@@ -170,21 +179,17 @@
     .filter-form .filter-buttons {
         display: flex;
         gap: 10px;
-        /* align-self: flex-end; Jika ingin tombol selalu di paling bawah */
     }
     .filter-form .filter-buttons .btn {
-        flex-grow: 1; /* Tombol berbagi ruang */
+        flex-grow: 1;
     }
 
-    .admin-table { /* Class spesifik untuk tabel admin ini */
-        border: 1px solid #e5e7eb; /* Border tabel lebih halus */
-    }
     .admin-table th {
-        background-color: #f9fafb; /* Warna header tabel sedikit berbeda */
+        background-color: #f9fafb;
         color: #374151;
         font-weight: 600;
         font-size: 0.9em;
-        text-transform: uppercase; /* Judul kolom uppercase */
+        text-transform: uppercase;
         letter-spacing: 0.5px;
     }
     .admin-table td {
@@ -210,7 +215,7 @@
         color: #9ca3af;
     }
     .table-link {
-        color: #1d4ed8; /* Warna link biru */
+        color: #1d4ed8;
         font-weight: 500;
         text-decoration: none;
     }
@@ -220,44 +225,31 @@
     .text-muted {
         color: #6b7280 !important;
     }
-
     .status-badge {
-        padding: 0.25em 0.6em;
-        font-size: 0.75em;
-        font-weight: 600;
-        border-radius: 0.25rem;
-        color: white;
-        text-transform: capitalize;
+        padding: 0.25em 0.6em; font-size: 0.75em; font-weight: 600; border-radius: 0.25rem; color: white; text-transform: capitalize;
     }
-    .status-disetujui { background-color: #10b981; /* Hijau (success) */ }
-    .status-menunggu { background-color: #f59e0b; /* Kuning (warning) */ }
-    .status-ditolak { background-color: #ef4444; /* Merah (danger) */ }
-
-    .action-buttons {
-        display: flex;
-        gap: 5px; /* Jarak antar tombol aksi */
-        align-items: center;
-    }
-    .action-buttons .btn-sm {
-        padding: 0.3rem 0.6rem; /* Padding tombol aksi */
-        display: inline-flex; /* Agar ikon dan teks sejajar */
-        align-items: center;
-        justify-content: center;
-    }
-    .action-buttons .icon {
-        margin-right: 0; /* Hapus margin jika hanya ikon */
-        font-size: 1em; /* Ukuran ikon emoji */
-    }
-    /* Jika tombol hanya ikon */
-    .action-buttons .btn-sm[title] .icon + span { display: none; } /* Sembunyikan teks jika hanya ikon */
-    .action-buttons .btn-sm[title] { min-width: 30px; } /* Lebar minimum untuk tombol ikon */
-
-    /* Untuk tombol edit yang ada teksnya */
+    .status-disetujui { background-color: #10b981; }
+    .status-menunggu { background-color: #f59e0b; }
+    .status-ditolak { background-color: #ef4444; }
+    .action-buttons { display: flex; gap: 5px; align-items: center; }
+    .action-buttons .btn-sm { padding: 0.3rem 0.6rem; display: inline-flex; align-items: center; justify-content: center; }
+    .action-buttons .icon { margin-right: 0; font-size: 1em; }
+    .action-buttons .btn-sm[title] .icon + span { display: none; }
+    .action-buttons .btn-sm[title] { min-width: 30px; }
     .action-buttons .btn-warning .icon { margin-right: 4px; }
-
-
-    /* Untuk d-inline pada form */
     .d-inline { display: inline-block !important; }
 
+    /* === CSS BARU UNTUK TOMBOL EKSPOR === */
+    .card-header .export-buttons {
+        display: flex;
+        gap: 10px;
+    }
+    .export-buttons .btn-sm {
+        font-size: 0.85em; /* Ukuran font tombol ekspor */
+        padding: 8px 12px;
+    }
+    .export-buttons .btn-sm .icon {
+        margin-right: 5px;
+    }
 </style>
 @endpush

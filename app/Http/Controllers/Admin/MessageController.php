@@ -1,23 +1,23 @@
 <?php
 
-namespace App\Http\Controllers\Admin; // Pastikan namespace benar
+namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Models\Message; // Import model Message
+use App\Models\Message;
 use Illuminate\Http\Request;
+// --- Import untuk Ekspor ---
+use Maatwebsite\Excel\Facades\Excel;
+use App\Exports\MessagesExport;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 class MessageController extends Controller
 {
-    // Jika Anda ingin semua method di controller ini dilindungi oleh middleware admin
-    // public function __construct()
-    // {
-    //     $this->middleware('admin');
-    // }
-
     /**
-     * Menampilkan daftar semua pesan masuk dengan filter.
+     * Method privat untuk membangun query filter pesan.
+     * @param Request $request
+     * @return \Illuminate\Database\Eloquent\Builder
      */
-    public function index(Request $request)
+    private function getMessageQuery(Request $request)
     {
         $query = Message::query()->with('user'); // Eager load relasi user jika ada
 
@@ -27,7 +27,6 @@ class MessageController extends Controller
             $query->where(function ($q) use ($searchTerm) {
                 $q->where('nama', 'like', '%' . $searchTerm . '%')
                   ->orWhere('email', 'like', '%' . $searchTerm . '%')
-                  // Jika pesan bisa dikirim oleh user yang login dan Anda ingin mencari berdasarkan nama user juga:
                   ->orWhereHas('user', function ($userQuery) use ($searchTerm) {
                       $userQuery->where('name', 'like', '%' . $searchTerm . '%')
                                 ->orWhere('email', 'like', '%' . $searchTerm . '%');
@@ -38,31 +37,57 @@ class MessageController extends Controller
         // Filter berdasarkan Status Baca
         if ($request->filled('search_status_baca')) {
             $statusBaca = $request->search_status_baca;
-            // Nilai dari form adalah '0' untuk Belum Dibaca (false) dan '1' untuk Sudah Dibaca (true)
             if ($statusBaca === '0' || $statusBaca === '1') {
                 $query->where('is_read', (bool)$statusBaca);
             }
         }
 
-        // Pengurutan (contoh: pesan terbaru dulu, lalu yang belum dibaca)
+        // Pengurutan (pesan yang belum dibaca dan terbaru akan muncul paling atas)
         $query->orderBy('is_read', 'asc')->orderBy('created_at', 'desc');
 
-        $messages = $query->paginate(10); // Ambil 10 data per halaman
+        return $query;
+    }
 
+    /**
+     * Menampilkan daftar semua pesan masuk dengan filter.
+     */
+    public function index(Request $request)
+    {
+        $query = $this->getMessageQuery($request);
+        $messages = $query->paginate(10); // Menambahkan paginasi
         return view('admin.messages.index', compact('messages'));
     }
 
     /**
-     * Menampilkan detail satu pesan.
-     * Juga menandai pesan sebagai sudah dibaca.
+     * Menangani ekspor data pesan masuk ke Excel atau PDF.
+     */
+    public function export(Request $request, $format)
+    {
+        $query = $this->getMessageQuery($request); // Menggunakan query yang sudah difilter
+        $filename = 'laporan-pesan-masuk-' . date('Y-m-d') . '.' . $format;
+
+        if ($format == 'xlsx') {
+            return Excel::download(new MessagesExport($query), $filename);
+        }
+
+        if ($format == 'pdf') {
+            $data = $query->get(); // Ambil semua data yang cocok
+            $pdf = Pdf::loadView('admin.messages.pdf', compact('data'));
+            return $pdf->download($filename);
+        }
+
+        return redirect()->back()->with('error', 'Format ekspor tidak didukung.');
+    }
+
+    /**
+     * Menampilkan detail satu pesan dan menandainya sebagai sudah dibaca.
      */
     public function show(Message $message)
     {
-        // Tandai pesan sebagai sudah dibaca jika belum
         if (!$message->is_read) {
             $message->update(['is_read' => true]);
         }
-        $message->load('user'); // Eager load user jika belum
+        $message->load('user');
         return view('admin.messages.show', compact('message'));
     }
 
@@ -71,15 +96,7 @@ class MessageController extends Controller
      */
     public function destroy(Message $message)
     {
-        // Tambahkan otorisasi jika perlu
         $message->delete();
         return redirect()->route('admin.messages.index')->with('success', 'Pesan berhasil dihapus.');
     }
-
-    // Opsional: Method untuk toggle status baca dari halaman index (jika diperlukan)
-    // public function toggleRead(Message $message)
-    // {
-    //     $message->update(['is_read' => !$message->is_read]);
-    //     return redirect()->back()->with('success', 'Status baca pesan berhasil diubah.');
-    // }
 }
