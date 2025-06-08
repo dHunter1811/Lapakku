@@ -3,238 +3,341 @@
 @section('title', 'Login - Lapakku')
 
 @section('content')
-<div class="container login-container">
-    <div class="card login-card">
-        <div class="card-header">
-            <div class="brand-logo">
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="48" height="48" fill="#00695C">
-                    <path d="M12 2L4 7v10l8 5 8-5V7L12 2zm0 2.5L18 9v6l-6 3.5-6-3.5V9l6-4.5zM12 15l4-2.2V9l-4 2.2-4-2.2v3.8l4 2.2z"/>
-                </svg>
-                <h1 class="brand-name">Lapakku</h1>
+<div class="login-wrapper">
+    <div class="login-container">
+        {{-- Kolom Kiri: Branding & Gambar --}}
+        <div class="login-branding-panel">
+            <div class="branding-content">
+                <a href="{{ route('home') }}" class="logo-link-login">
+                    {{-- Ganti dengan logo SVG atau PNG berkualitas tinggi yang transparan --}}
+                    <img src="{{ asset('images/logo-lapakku.png') }}" onerror="this.onerror=null;this.src='https://placehold.co/60x60/transparent/FFFFFF?text=Logo';" alt="Lapakku Logo" class="logo-image-login">
+                    <span>Lapakku</span>
+                </a>
+                <h1 class="branding-title">Temukan Peluang Usaha Anda.</h1>
+                <p class="branding-subtitle">Masuk untuk mengelola lahan, melihat pengajuan sewa, dan memulai perjalanan bisnis Anda.</p>
             </div>
-            <h2 class="login-title">Masuk ke Akun Anda</h2>
+            <div class="illustration-overlay">
+                {{-- Ilustrasi atau icon tambahan bisa ditambahkan di sini --}}
+                <svg class="w-24 h-24 text-white opacity-80" fill="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.47-7-7.43 0-2.3.94-4.38 2.45-5.92L12 12l-1 7.93zM12 4.07c3.95.49 7 3.47 7 7.43 0 2.3-.94 4.38-2.45 5.92L12 12l1-7.93z"/>
+                </svg>
+            </div>
         </div>
 
-        <div class="card-body">
+        {{-- Kolom Kanan: Form Login --}}
+        <div class="login-form-panel">
+            <h2 class="form-title">Selamat Datang Kembali!</h2>
+            <p class="form-subtitle">Silakan masuk ke akun Anda.</p>
+
             @if ($errors->any())
-                <div class="alert alert-danger">
-                    <ul class="error-list">
-                        @foreach ($errors->all() as $error)
-                            <li>{{ $error }}</li>
-                        @endforeach
-                    </ul>
-                </div>
+            <div class="alert alert-danger validation-summary">
+                <strong class="font-semibold block mb-1">Gagal Login</strong>
+                <span>{{ $errors->first('email') ?: $errors->first('password') }}</span>
+            </div>
             @endif
 
             <form method="POST" action="{{ route('login') }}" class="login-form">
                 @csrf
                 <div class="form-group">
-                    <label for="email" class="form-label">Email</label>
+                    <label for="email" class="form-label">Alamat Email</label>
                     <div class="input-group">
-                        <!-- <span class="input-icon">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
-                                <path d="M.05 3.555A2 2 0 0 1 2 2h12a2 2 0 0 1 1.95 1.555L8 8.414.05 3.555ZM0 4.697v7.104l5.803-3.558L0 4.697ZM6.761 8.83l-6.57 4.027A2 2 0 0 0 2 14h12a2 2 0 0 0 1.808-1.144l-6.57-4.027L8 9.586l-1.239-.757Zm3.436-.586L16 11.801V4.697l-5.803 3.546Z"/>
+                        <span class="input-icon">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16">
+                                <path d="M.05 3.555A2 2 0 0 1 2 2h12a2 2 0 0 1 1.95 1.555L8 8.414.05 3.555ZM0 4.697v7.104l5.803-3.558L0 4.697ZM6.761 8.83l-6.57 4.027A2 2 0 0 0 2 14h12a2 2 0 0 0 1.808-1.144l-6.57-4.027L8 9.586l-1.239-.756Zm6.43-.586L16 11.801V4.697l-5.803 3.558L13.19 8.244Z"/>
                             </svg>
-                        </span> -->
-                        <input id="email" type="email" name="email" value="{{ old('email') }}" required autofocus class="form-input" placeholder="Masukkan alamat email">
+                        </span>
+                        <input id="email" type="email" name="email" class="form-control" value="{{ old('email') }}" required autofocus placeholder="contoh@email.com">
                     </div>
                 </div>
 
                 <div class="form-group">
                     <label for="password" class="form-label">Password</label>
-                    <div class="input-group">
-                        <!-- <span class="input-icon">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                    <div class="input-group password-group">
+                        <span class="input-icon">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16">
                                 <path d="M8 1a2 2 0 0 1 2 2v4H6V3a2 2 0 0 1 2-2zm3 6V3a3 3 0 0 0-6 0v4a2 2 0 0 0-2 2v5a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2z"/>
                             </svg>
-                        </span> -->
-                        <input id="password" type="password" name="password" required class="form-input" placeholder="Masukkan password">
-                        <button type="button" class="password-toggle">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
-                                <path d="M16 8s-3-5.5-8-5.5S0 8 0 8s3 5.5 8 5.5S16 8 16 8zM1.173 8a13.133 13.133 0 0 1 1.66-2.043C4.12 4.668 5.88 3.5 8 3.5c2.12 0 3.879 1.168 5.168 2.457A13.133 13.133 0 0 1 14.828 8c-.058.087-.122.183-.195.288-.335.48-.83 1.12-1.465 1.755C11.879 11.332 10.119 12.5 8 12.5c-2.12 0-3.879-1.168-5.168-2.457A13.134 13.134 0 0 1 1.172 8z"/>
-                                <path d="M8 5.5a2.5 2.5 0 1 0 0 5 2.5 2.5 0 0 0 0-5zM4.5 8a3.5 3.5 0 1 1 7 0 3.5 3.5 0 0 1-7 0z"/>
+                        </span>
+                        <input id="password" type="password" name="password" class="form-control" required placeholder="Masukkan password Anda">
+                        <button type="button" id="togglePassword" class="password-toggle-btn" title="Show/Hide Password">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" viewBox="0 0 16 16">
+                                <path d="M10.5 8a2.5 2.5 0 1 1-5 0 2.5 2.5 0 0 1 5 0z"/>
+                                <path d="M0 8s3-5.5 8-5.5S16 8 16 8s-3 5.5-8 5.5S0 8 0 8zm8 3.5a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7z"/>
                             </svg>
                         </button>
                     </div>
                 </div>
 
-                <div class="form-options">
+                <div class="form-group-inline">
                     <div class="remember-me">
-                        <input type="checkbox" name="remember" id="remember" {{ old('remember') ? 'checked' : '' }} class="checkbox">
-                        <label for="remember" class="checkbox-label">Ingat Saya</label>
+                        <input class="form-check-input" type="checkbox" name="remember" id="remember" {{ old('remember') ? 'checked' : '' }}>
+                        <label class="form-check-label" for="remember">
+                            Ingat Saya
+                        </label>
                     </div>
                     @if (Route::has('password.request'))
-                        <a href="{{ route('password.request') }}" class="forgot-password">Lupa Password?</a>
+                        <a class="forgot-password-link" href="{{ route('password.request') }}">
+                            Lupa Password?
+                        </a>
                     @endif
                 </div>
 
-                <button type="submit" class="login-button">Masuk</button>
+                <div class="form-group mt-6">
+                    <button type="submit" class="btn btn-primary btn-block">Login</button>
+                </div>
+
+                <div class="form-divider">
+                    <span>atau</span>
+                </div>
+
+                <div class="form-group">
+                    <a href="{{ route('register') }}" class="btn btn-secondary btn-block">Belum punya akun? Register</a>
+                </div>
             </form>
-
-            <div class="divider">
-                <span>atau</span>
-            </div>
-
-            <div class="social-login">
-                <button type="button" class="social-button google-button">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16" class="social-icon">
-                        <path d="M15.545 6.558a9.42 9.42 0 0 1 .139 1.626c0 2.434-.87 4.492-2.384 5.885h.002C11.978 15.292 10.158 16 8 16A8 8 0 1 1 8 0a7.689 7.689 0 0 1 5.352 2.082l-2.284 2.284A4.347 4.347 0 0 0 8 3.166c-2.087 0-3.86 1.408-4.492 3.304a4.792 4.792 0 0 0 0 3.063h.003c.635 1.893 2.405 3.301 4.492 3.301 1.078 0 2.004-.276 2.722-.764h-.003a3.702 3.702 0 0 0 1.599-2.431H8v-3.08h7.545z"/>
-                    </svg>
-                    Lanjutkan dengan Google
-                </button>
-                <button type="button" class="social-button facebook-button">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16" class="social-icon">
-                        <path d="M16 8.049c0-4.446-3.582-8.05-8-8.05C3.58 0-.002 3.603-.002 8.05c0 4.017 2.926 7.347 6.75 7.951v-5.625h-2.03V8.05H6.75V6.275c0-2.017 1.195-3.131 3.022-3.131.876 0 1.791.157 1.791.157v1.98h-1.009c-.993 0-1.303.621-1.303 1.258v1.51h2.218l-.354 2.326H9.25V16c3.824-.604 6.75-3.934 6.75-7.951z"/>
-                    </svg>
-                    Lanjutkan dengan Facebook
-                </button>
-            </div>
-
-            <div class="register-link">
-                Belum punya akun? <a href="{{ route('register') }}" class="register-button">Daftar Sekarang</a>
-            </div>
         </div>
     </div>
 </div>
 @endsection
 
+@push('styles')
 <style>
+    /* Global Variables (consistent with home.blade.php) */
     :root {
         --primary-color: #00695C;
         --primary-light: #4DB6AC;
+        --primary-dark: #004D40;
         --secondary-color: #FF8F00;
-        --error-color: #D32F2F;
-        --text-color: #333333;
-        --light-gray: #F5F5F5;
-        --medium-gray: #E0E0E0;
-        --dark-gray: #757575;
+        --secondary-light: #FFC107;
+        --dark-color: #263238;
+        --light-color: #F5F5F5;
+        --gray-color: #757575;
+        --light-gray: #E0E0E0;
         --white: #FFFFFF;
+        --shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+        --shadow-hover: 0 8px 16px rgba(0, 0, 0, 0.12);
+        --radius: 12px; /* Lebih besar untuk login container */
+        --transition: all 0.3s ease;
+    }
+
+    * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+    }
+
+    body {
+        font-family: 'Inter', sans-serif;
+        line-height: 1.6;
+        color: var(--dark-color);
+        background-color: var(--light-color);
+    }
+
+    /* Override main layout container for full width login */
+    .login-wrapper {
+        width: 100%;
+        min-height: 100vh; /* Menggunakan 100vh untuk mengisi seluruh tinggi viewport */
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 20px;
+        background: linear-gradient(to bottom right, var(--primary-dark), var(--primary-light));
+        /* Gradasi latar belakang yang lebih dinamis */
     }
 
     .login-container {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        min-height: 100vh;
-        padding: 20px;
-        background-color: var(--light-gray);
-    }
-
-    .login-card {
+        display: grid;
+        grid-template-columns: 1fr 1fr; /* Dua kolom sama lebar */
+        max-width: 960px; /* Lebar maksimum yang sedikit lebih besar */
         width: 100%;
-        max-width: 450px;
-        border-radius: 12px;
-        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
-        overflow: hidden;
-        border: none;
-    }
-
-    .card-header {
         background-color: var(--white);
-        padding: 30px 30px 20px;
-        text-align: center;
-        border-bottom: 1px solid var(--medium-gray);
+        border-radius: var(--radius);
+        box-shadow: 0 15px 40px rgba(0, 0, 0, 0.25); /* Bayangan lebih dalam */
+        overflow: hidden;
+        min-height: 550px; /* Tinggi minimum untuk estetika */
     }
 
-    .brand-logo {
+    /* Panel Kiri (Branding) */
+    .login-branding-panel {
+        background: url('https://images.unsplash.com/photo-1600880292203-942bb68b2432?q=80&w=1887&auto=format&fit=crop') center center/cover no-repeat;
+        color: var(--white);
+        padding: 40px;
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-end; /* Konten ke bawah */
+        position: relative;
+    }
+
+    .login-branding-panel::before {
+        /* Overlay gelap dengan gradasi */
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: linear-gradient(to top, rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.3));
+    }
+
+    .illustration-overlay {
+        position: absolute;
+        top: 20px;
+        right: 20px;
+        z-index: 1;
+        opacity: 0.2; /* Lebih samar */
+    }
+
+    .branding-content {
+        position: relative;
+        z-index: 2; /* Pastikan di atas overlay dan ilustrasi */
+    }
+
+    .logo-link-login {
         display: flex;
         align-items: center;
-        justify-content: center;
+        text-decoration: none;
+        color: var(--white);
+        margin-bottom: 25px; /* Jarak lebih besar */
+        transition: var(--transition);
+    }
+
+    .logo-link-login:hover {
+        opacity: 0.8;
+    }
+
+    .logo-image-login {
+        height: 50px; /* Ukuran logo lebih besar */
+        margin-right: 15px;
+        border-radius: 8px; /* Sudut sedikit membulat untuk logo */
+    }
+
+    .logo-link-login span {
+        font-size: 2.2em; /* Ukuran teks logo lebih besar */
+        font-weight: 800;
+        letter-spacing: 0.5px;
+    }
+
+    .branding-title {
+        font-size: 2.5em; /* Ukuran judul lebih besar */
+        line-height: 1.2;
         margin-bottom: 15px;
+        font-weight: 800;
     }
 
-    .brand-name {
-        font-size: 24px;
+    .branding-subtitle {
+        font-size: 1.1em; /* Ukuran subtitle lebih besar */
+        opacity: 0.9;
+        line-height: 1.6;
+    }
+
+    /* Panel Kanan (Form) */
+    .login-form-panel {
+        padding: 50px; /* Padding lebih besar */
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+    }
+
+    .form-title {
+        font-size: 2em; /* Ukuran judul form lebih besar */
+        color: var(--dark-color);
         font-weight: 700;
-        color: var(--primary-color);
-        margin-left: 10px;
+        margin-bottom: 10px;
     }
 
-    .login-title {
-        font-size: 18px;
-        color: var(--text-color);
-        margin: 0;
-        font-weight: 500;
+    .form-subtitle {
+        color: var(--gray-color);
+        margin-bottom: 30px; /* Jarak lebih besar */
+        font-size: 1.1em;
     }
 
-    .card-body {
-        padding: 30px;
-        background-color: var(--white);
+    .login-form .form-group {
+        margin-bottom: 1.5rem; /* Jarak antar group form */
     }
 
-    .alert-danger {
-        background-color: rgba(211, 47, 47, 0.1);
-        color: var(--error-color);
-        border-radius: 8px;
-        padding: 12px 15px;
-        margin-bottom: 20px;
-        border: 1px solid rgba(211, 47, 47, 0.2);
-    }
-
-    .error-list {
-        margin: 0;
-        padding-left: 20px;
-        list-style-type: none;
-    }
-
-    .error-list li {
-        font-size: 14px;
-    }
-
-    .form-group {
-        margin-bottom: 20px;
-    }
-
-    .form-label {
+    .login-form .form-label {
         display: block;
-        margin-bottom: 8px;
-        font-size: 14px;
-        color: var(--text-color);
-        font-weight: 500;
+        margin-bottom: 0.6rem;
+        font-weight: 600;
+        color: var(--dark-color);
+        font-size: 0.95em;
     }
 
     .input-group {
         position: relative;
-        display: flex;
-        align-items: center;
     }
 
-    .input-icon {
+    .input-group .input-icon {
         position: absolute;
-        left: 12px;
-        color: var(--dark-gray);
+        top: 50%;
+        left: 15px;
+        transform: translateY(-50%);
+        color: var(--gray-color);
+        width: 20px;
+        height: 20px;
     }
 
-    .form-input {
+    .input-group .input-icon svg {
         width: 100%;
-        padding: 12px 15px 12px 40px;
-        border: 1px solid var(--medium-gray);
-        border-radius: 8px;
-        font-size: 14px;
-        transition: all 0.3s ease;
+        height: 100%;
     }
 
-    .form-input:focus {
+    .login-form .form-control {
+        width: 100%;
+        padding: 14px 15px 14px 50px; /* Padding kiri lebih besar untuk ikon */
+        border: 1px solid var(--light-gray);
+        border-radius: 8px; /* Sudut membulat */
+        font-size: 1em;
+        transition: var(--transition);
+        background-color: var(--light-color); /* Latar belakang input */
+    }
+
+    .login-form .form-control:focus {
         outline: none;
         border-color: var(--primary-color);
-        box-shadow: 0 0 0 2px rgba(0, 105, 92, 0.2);
+        box-shadow: 0 0 0 3px rgba(0, 105, 92, 0.2);
+        background-color: var(--white);
     }
 
-    .password-toggle {
+    .password-group .form-control {
+        padding-right: 50px; /* Padding kanan untuk tombol toggle */
+    }
+
+    .password-toggle-btn {
         position: absolute;
-        right: 12px;
+        top: 50%;
+        right: 15px;
+        transform: translateY(-50%);
         background: none;
         border: none;
-        color: var(--dark-gray);
         cursor: pointer;
-        padding: 0;
+        color: var(--gray-color);
+        font-size: 1.2em;
+        transition: var(--transition);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 30px;
+        height: 30px;
+        border-radius: 50%;
     }
 
-    .form-options {
+    .password-toggle-btn:hover {
+        color: var(--primary-color);
+        background-color: rgba(0, 105, 92, 0.1);
+    }
+    
+    .password-toggle-btn svg {
+        width: 18px;
+        height: 18px;
+    }
+
+    .form-group-inline {
         display: flex;
         justify-content: space-between;
         align-items: center;
-        margin: 20px 0;
+        margin-bottom: 1.5rem;
+        font-size: 0.95em;
+        color: var(--gray-color);
     }
 
     .remember-me {
@@ -242,164 +345,191 @@
         align-items: center;
     }
 
-    .checkbox {
-        width: 16px;
-        height: 16px;
+    .remember-me input[type="checkbox"] {
         margin-right: 8px;
-        accent-color: var(--primary-color);
+        width: 18px;
+        height: 18px;
+        accent-color: var(--primary-color); /* Warna checkbox */
     }
 
-    .checkbox-label {
-        font-size: 14px;
-        color: var(--text-color);
+    .remember-me label {
+        margin: 0;
+        color: var(--dark-color);
     }
 
-    .forgot-password {
-        font-size: 14px;
+    .forgot-password-link {
         color: var(--primary-color);
         text-decoration: none;
-        transition: color 0.2s;
+        font-weight: 500;
+        transition: var(--transition);
     }
 
-    .forgot-password:hover {
-        color: var(--primary-light);
+    .forgot-password-link:hover {
         text-decoration: underline;
+        color: var(--primary-dark);
     }
 
-    .login-button {
+    /* Buttons (re-using primary/secondary from home.blade.php concept) */
+    .btn-block {
         width: 100%;
-        padding: 12px;
+        padding: 14px; /* Padding lebih besar */
+        font-size: 1.05em; /* Ukuran font lebih besar */
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.8px;
+        border-radius: 50px; /* Lebih bulat */
+        transition: var(--transition);
+        border: none;
+        cursor: pointer;
+        text-decoration: none; /* Untuk tombol link */
+        display: block; /* Untuk tombol link */
+        text-align: center; /* Untuk tombol link */
+    }
+
+    .btn-primary {
         background-color: var(--primary-color);
         color: var(--white);
-        border: none;
-        border-radius: 8px;
-        font-size: 16px;
-        font-weight: 500;
-        cursor: pointer;
-        transition: background-color 0.3s;
+        box-shadow: 0 4px 10px rgba(0, 105, 92, 0.3);
     }
 
-    .login-button:hover {
-        background-color: #00897B;
+    .btn-primary:hover {
+        background-color: var(--primary-dark);
+        transform: translateY(-2px);
+        box-shadow: 0 6px 15px rgba(0, 105, 92, 0.4);
     }
 
-    .divider {
-        display: flex;
-        align-items: center;
-        margin: 25px 0;
-        color: var(--dark-gray);
-        font-size: 14px;
-    }
-
-    .divider::before, .divider::after {
-        content: "";
-        flex: 1;
-        border-bottom: 1px solid var(--medium-gray);
-    }
-
-    .divider::before {
-        margin-right: 10px;
-    }
-
-    .divider::after {
-        margin-left: 10px;
-    }
-
-    .social-login {
-        margin-bottom: 20px;
-    }
-
-    .social-button {
-        width: 100%;
-        padding: 12px;
-        border-radius: 8px;
-        font-size: 14px;
-        font-weight: 500;
-        cursor: pointer;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        margin-bottom: 10px;
-        border: 1px solid var(--medium-gray);
+    .btn-secondary {
         background-color: var(--white);
-        color: var(--text-color);
-        transition: all 0.3s;
-    }
-
-    .social-button:hover {
-        background-color: var(--light-gray);
-    }
-
-    .social-icon {
-        margin-right: 10px;
-    }
-
-    .google-button {
-        color: #DB4437;
-    }
-
-    .facebook-button {
-        color: #4267B2;
-    }
-
-    .register-link {
-        text-align: center;
-        font-size: 14px;
-        color: var(--text-color);
-        margin-top: 20px;
-    }
-
-    .register-button {
         color: var(--primary-color);
-        font-weight: 500;
-        text-decoration: none;
-        transition: color 0.2s;
+        border: 2px solid var(--primary-color);
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
     }
 
-    .register-button:hover {
-        color: var(--primary-light);
-        text-decoration: underline;
+    .btn-secondary:hover {
+        background-color: rgba(0, 105, 92, 0.1);
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .form-divider {
+        display: flex;
+        align-items: center;
+        text-align: center;
+        color: var(--gray-color);
+        margin: 25px 0; /* Jarak lebih besar */
+        font-size: 0.95em;
+    }
+
+    .form-divider::before,
+    .form-divider::after {
+        content: '';
+        flex: 1;
+        border-bottom: 1px solid var(--light-gray);
+    }
+
+    .form-divider:not(:empty)::before {
+        margin-right: .75em; /* Jarak lebih besar */
+    }
+
+    .form-divider:not(:empty)::after {
+        margin-left: .75em; /* Jarak lebih besar */
+    }
+
+    .validation-summary {
+        background-color: #ffebee; /* Warna merah muda lembut */
+        color: #d32f2f; /* Warna teks merah gelap */
+        border: 1px solid #ef9a9a; /* Border merah muda */
+        border-radius: 8px;
+        padding: 15px;
+        margin-bottom: 25px;
+        font-size: 0.9em;
+        line-height: 1.5;
+        box-shadow: 0 2px 5px rgba(211, 47, 47, 0.1);
+    }
+
+    /* Responsif */
+    @media (max-width: 800px) {
+        .login-container {
+            grid-template-columns: 1fr; /* Satu kolom di layar kecil */
+            max-width: 450px; /* Batasi lebar di mobile */
+            min-height: auto; /* Biarkan tinggi menyesuaikan konten */
+        }
+
+        .login-branding-panel {
+            display: none; /* Sembunyikan panel gambar di mobile agar form lebih fokus */
+        }
+
+        .login-form-panel {
+            padding: 30px; /* Padding lebih kecil di mobile */
+        }
+
+        .form-title {
+            font-size: 1.6em;
+        }
+
+        .form-subtitle {
+            font-size: 1em;
+            margin-bottom: 20px;
+        }
+
+        .login-form .form-group {
+            margin-bottom: 1.2rem;
+        }
+
+        .login-form .form-control {
+            padding: 12px 15px 12px 45px;
+        }
+
+        .password-group .form-control {
+            padding-right: 45px;
+        }
     }
 
     @media (max-width: 480px) {
-        .login-card {
-            border-radius: 0;
+        .login-wrapper {
+            padding: 10px;
         }
-        
-        .card-header, .card-body {
-            padding: 25px 20px;
+
+        .login-container {
+            border-radius: 8px; /* Lebih kecil di mobile */
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        .login-form-panel {
+            padding: 25px;
+        }
+
+        .btn-block {
+            padding: 12px;
+            font-size: 0.95em;
+        }
+
+        .validation-summary {
+            padding: 12px;
+            margin-bottom: 20px;
         }
     }
 </style>
+@endpush
 
+@push('scripts')
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-        const passwordToggle = document.querySelector('.password-toggle');
+        const togglePassword = document.getElementById('togglePassword');
         const passwordInput = document.getElementById('password');
-        
-        if (passwordToggle && passwordInput) {
-            passwordToggle.addEventListener('click', function() {
+
+        if (togglePassword && passwordInput) {
+            togglePassword.addEventListener('click', function() {
                 const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
                 passwordInput.setAttribute('type', type);
-                
-                // Toggle icon
-                if (type === 'text') {
-                    passwordToggle.innerHTML = `
-                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
-                            <path d="M13.359 11.238C15.06 9.72 16 8 16 8s-3-5.5-8-5.5a7.028 7.028 0 0 0-2.79.588l.77.771A5.944 5.944 0 0 1 8 3.5c2.12 0 3.879 1.168 5.168 2.457A13.134 13.134 0 0 1 14.828 8c-.058.087-.122.183-.195.288-.335.48-.83 1.12-1.465 1.755-.165.165-.337.328-.517.486l.708.709z"/>
-                            <path d="M11.297 9.176a3.5 3.5 0 0 0-4.474-4.474l.823.823a2.5 2.5 0 0 1 2.829 2.829l.822.822zm-2.943 1.299.822.822a3.5 3.5 0 0 1-4.474-4.474l.823.823a2.5 2.5 0 0 0 2.829 2.829z"/>
-                            <path d="M3.35 5.47c-.18.16-.353.322-.518.487A13.134 13.134 0 0 0 1.172 8l.195.288c.335.48.83 1.12 1.465 1.755C4.121 11.332 5.881 12.5 8 12.5c.716 0 1.39-.133 2.02-.36l.77.772A7.029 7.029 0 0 1 8 13.5C3 13.5 0 8 0 8s.939-1.721 2.641-3.238l.708.709zm10.296 8.884-12-12 .708-.708 12 12-.708.708z"/>
-                        </svg>
-                    `;
-                } else {
-                    passwordToggle.innerHTML = `
-                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
-                            <path d="M16 8s-3-5.5-8-5.5S0 8 0 8s3 5.5 8 5.5S16 8 16 8zM1.173 8a13.133 13.133 0 0 1 1.66-2.043C4.12 4.668 5.88 3.5 8 3.5c2.12 0 3.879 1.168 5.168 2.457A13.133 13.133 0 0 1 14.828 8c-.058.087-.122.183-.195.288-.335.48-.83 1.12-1.465 1.755C11.879 11.332 10.119 12.5 8 12.5c-2.12 0-3.879-1.168-5.168-2.457A13.134 13.134 0 0 1 1.172 8z"/>
-                            <path d="M8 5.5a2.5 2.5 0 1 0 0 5 2.5 2.5 0 0 0 0-5zM4.5 8a3.5 3.5 0 1 1 7 0 3.5 3.5 0 0 1-7 0z"/>
-                        </svg>
-                    `;
-                }
+
+                // Ganti ikon SVG
+                const iconPath = type === 'password'
+                    ? '<path d="M10.5 8a2.5 2.5 0 1 1-5 0 2.5 2.5 0 0 1 5 0z"/><path d="M0 8s3-5.5 8-5.5S16 8 16 8s-3 5.5-8 5.5S0 8 0 8zm8 3.5a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7z"/>'
+                    : '<path d="M13.359 11.238C15.06 9.72 16 8 16 8s-3-5.5-8-5.5S0 8 0 8a11.77 11.77 0 0 1 1.669-2.046l.704.705A10.706 10.706 0 0 0 1 8c.796 2.022 3.078 4.385 6.29 5.568l.22.235.235.22A13.824 13.824 0 0 0 8 14.5c.677 0 1.341-.122 1.98-.363l.298-.112z"/><path d="M8 6a2 2 0 1 0 0 4 2 2 0 0 0 0-4zm0 3a1 1 0 1 1 0-2 1 1 0 0 1 0 2z"/>';
+                this.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" viewBox="0 0 16 16">${iconPath}</svg>`;
             });
         }
     });
 </script>
+@endpush

@@ -6,6 +6,7 @@ use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Facades\Storage; // Pastikan Storage di-import
 
 class User extends Authenticatable // implements MustVerifyEmail (jika menggunakan verifikasi email)
 {
@@ -20,9 +21,10 @@ class User extends Authenticatable // implements MustVerifyEmail (jika menggunak
         'name',
         'email',
         'password',
-        'alamat',      // Tambahan dari wireframe register
-        'no_telepon',  // Tambahan dari wireframe register
-        'role',        // Untuk membedakan user dan admin (mis. 'user', 'admin')
+        'alamat',
+        'no_telepon',
+        'role',
+        'profile_photo_path',
     ];
 
     /**
@@ -42,7 +44,7 @@ class User extends Authenticatable // implements MustVerifyEmail (jika menggunak
      */
     protected $casts = [
         'email_verified_at' => 'datetime',
-        'password' => 'hashed', // Otomatis hash password saat diset
+        'password' => 'hashed',
     ];
 
     /**
@@ -62,11 +64,52 @@ class User extends Authenticatable // implements MustVerifyEmail (jika menggunak
     }
 
     /**
-     * Relasi: User bisa mengirim banyak Pesan (jika pesan terhubung ke user).
-     * Asumsi kolom 'user_id' di tabel messages.
+     * Relasi: User bisa mengirim banyak Pesan.
      */
     public function messages()
     {
         return $this->hasMany(Message::class);
     }
+
+    /**
+     * Accessor untuk mendapatkan URL foto profil.
+     * Akan mengembalikan URL foto yang diupload atau URL foto default.
+     *
+     * @return string
+     */
+    public function getProfilePhotoUrlAttribute()
+    {
+        // Cek apakah profile_photo_path ada isinya (tidak null dan tidak string kosong)
+        // DAN file tersebut benar-benar ada di storage publik
+        if ($this->profile_photo_path && Storage::disk('public')->exists($this->profile_photo_path)) {
+            return Storage::url($this->profile_photo_path);
+        }
+
+        // Jika tidak ada foto profil yang diupload atau file tidak ditemukan,
+        // kembalikan path ke foto default Anda.
+        // PASTIKAN file 'default-avatar.png' (atau nama file Anda)
+        // ADA DI DALAM folder 'public/images/'.
+        return asset('images/default-avatar.png');
+
+        // Alternatif jika Anda tidak ingin menggunakan file fisik untuk default,
+        // Anda bisa menggunakan layanan placeholder seperti ui-avatars.com:
+        // return 'https://ui-avatars.com/api/?name=' . urlencode($this->name) . '&color=7F9CF5&background=EBF4FF';
+    }
+
+    /**
+     * Relasi: User bisa memberikan banyak Rating.
+     */
+    // public function ratings()
+    // {
+    //     return $this->hasMany(Rating::class);
+    // }
+
+    // /**
+    //  * Relasi: User bisa mengirim banyak Pesan (jika pesan terhubung ke user).
+    //  * Asumsi kolom 'user_id' di tabel messages.
+    //  */
+    // public function messages()
+    // {
+    //     return $this->hasMany(Message::class);
+    // }
 }

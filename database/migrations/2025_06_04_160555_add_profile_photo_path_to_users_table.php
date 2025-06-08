@@ -9,20 +9,21 @@ return new class extends Migration
     /**
      * Run the migrations.
      */
-    public function up()
+    public function up(): void
     {
         Schema::table('users', function (Blueprint $table) {
-            $table->string('alamat')->nullable();
-            $table->string('no_telepon')->nullable();
-            $table->string('role')->default('user');
+            // Tambahkan kolom setelah kolom 'email' atau sesuaikan posisinya
+            $table->string('profile_photo_path')->nullable()->after('email');
         });
     }
 
-    public function down()
+    /**
+     * Reverse the migrations.
+     */
+    public function down(): void
     {
         Schema::table('users', function (Blueprint $table) {
-            $table->dropColumn(['alamat', 'no_telepon', 'role']);
+            $table->dropColumn('profile_photo_path');
         });
     }
-
 };
