@@ -99,3 +99,10 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::put('users/{user}', [AdminUserManagementController::class, 'update'])->name('users.update');
     Route::delete('users/{user}', [AdminUserManagementController::class, 'destroy'])->name('users.destroy');
 });
+
+// LOG RAILWAY
+Route::get('/log', function () {
+    $log = storage_path('logs/laravel.log');
+    if (!file_exists($log)) return 'No log file yet.';
+    return nl2br(file_get_contents($log));
+});
