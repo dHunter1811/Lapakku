@@ -15,9 +15,9 @@ WORKDIR /var/www/html
 COPY . /var/www/html
 
 # Set permissions
-RUN chown -R www-data:www-data /var/www/html \
-    && chmod -R 755 /var/www/html/storage \
-    && chmod -R 755 /var/www/html/bootstrap/cache
+# Set permissions
+RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache \
+    && chmod -R 775 /var/www/html/storage /var/www/html/bootstrap/cache
 
 # Set document root to Laravel's public
 ENV APACHE_DOCUMENT_ROOT /var/www/html/public

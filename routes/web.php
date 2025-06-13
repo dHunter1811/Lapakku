@@ -103,6 +103,17 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
 // LOG RAILWAY
 Route::get('/log', function () {
     $log = storage_path('logs/laravel.log');
-    if (!file_exists($log)) return 'No log file yet.';
-    return nl2br(file_get_contents($log));
+    if (!file_exists($log)) return '❌ No log file';
+    
+    try {
+        return nl2br(file_get_contents($log));
+    } catch (\Exception $e) {
+        return '❌ Cannot read log: ' . $e->getMessage();
+    }
+});
+
+Route::get('/check-storage', function () {
+    $storage = storage_path();
+    $canWrite = is_writable($storage . '/logs') ? '✔ Writable' : '❌ Not Writable';
+    return "Storage/logs: $canWrite";
 });
