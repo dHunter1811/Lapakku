@@ -37,7 +37,8 @@ RUN php artisan config:cache && \
     php artisan migrate --force || true
 
 # Expose port 80
-EXPOSE 80
+RUN sed -i 's/80/8080/g' /etc/apache2/ports.conf /etc/apache2/sites-enabled/000-default.conf
+EXPOSE 8080
 
 # Start Apache in foreground
 CMD ["apache2-foreground"]
