@@ -101,6 +101,6 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
 });
 
 // // LOG RAILWAY HEALTH CHECK
-Route::get('/health', function () {
-    return response('OK', 200);
-});
+// Route::get('/health', function () {
+//     return response('OK', 200);
+// });
