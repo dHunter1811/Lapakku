@@ -179,7 +179,7 @@
                                         <span class="text-muted">{{ $pengajuan->status }}</span>
                                         @endif
                                         @if($pengajuan->penyewa && $pengajuan->penyewa->no_telepon)
-                                        <a href="https://wa.me/{{ $pengajuan->penyewa->no_telepon }}" target="_blank" class="btn btn-success btn-xs">
+                                        <a href="https://wa.me/62{{ $pengajuan->penyewa->no_telepon }}" target="_blank" class="btn btn-success btn-xs">
                                             💬 WhatsApp
                                         </a>
                                         @endif
