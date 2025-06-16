@@ -6,7 +6,9 @@ use App\Http\Controllers\Controller;
 use App\Models\Lahan;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
-use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\File; // Pastikan ini diimpor
+use Illuminate\Support\Facades\Storage; // Ini bisa tetap ada, tapi tidak digunakan untuk operasi file langsung di public_path
+
 // --- Import untuk Ekspor ---
 use Maatwebsite\Excel\Facades\Excel;
 use App\Exports\LahanExport;
@@ -28,10 +30,10 @@ class LahanManagementController extends Controller
             $searchTerm = $request->search_query;
             $query->where(function ($q) use ($searchTerm) {
                 $q->where('judul', 'like', '%' . $searchTerm . '%')
-                  ->orWhereHas('user', function ($userQuery) use ($searchTerm) {
-                      $userQuery->where('name', 'like', '%' . $searchTerm . '%')
-                                ->orWhere('email', 'like', '%' . $searchTerm . '%');
-                  });
+                    ->orWhereHas('user', function ($userQuery) use ($searchTerm) {
+                        $userQuery->where('name', 'like', '%' . $searchTerm . '%')
+                            ->orWhere('email', 'like', '%' . $searchTerm . '%');
+                    });
             });
         }
 
@@ -85,7 +87,7 @@ class LahanManagementController extends Controller
             $pdf = Pdf::loadView('admin.lahan.pdf', compact('data'));
             return $pdf->download($filename);
         }
-        
+
         return redirect()->back()->with('error', 'Format ekspor tidak didukung.');
     }
 
@@ -124,13 +126,24 @@ class LahanManagementController extends Controller
 
         if ($validator->fails()) {
             return redirect()->route('admin.lahan.edit', $lahan->id)
-                        ->withErrors($validator)
-                        ->withInput();
+                ->withErrors($validator)
+                ->withInput();
         }
 
+        // Pastikan direktori penyimpanan gambar ada
+        File::makeDirectory(public_path('asset_web_images/lahan'), 0755, true, true);
+
         $dataToUpdate = $request->only([
-            'judul', 'deskripsi', 'tipe_lahan', 'lokasi', 'harga_sewa', 'alamat_lengkap', 'status',
-            'latitude', 'longitude', 'no_whatsapp'
+            'judul',
+            'deskripsi',
+            'tipe_lahan',
+            'lokasi',
+            'harga_sewa',
+            'alamat_lengkap',
+            'status',
+            'latitude',
+            'longitude',
+            'no_whatsapp'
         ]);
 
         if ($request->has('keuntungan_lokasi')) {
@@ -140,20 +153,36 @@ class LahanManagementController extends Controller
             $dataToUpdate['keuntungan_lokasi'] = null;
         }
 
+        // Mengelola gambar utama
         if ($request->hasFile('gambar_utama')) {
-            if ($lahan->gambar_utama && Storage::disk('public')->exists($lahan->gambar_utama)) {
-                Storage::disk('public')->delete($lahan->gambar_utama);
+            // Hapus gambar lama jika ada
+            if ($lahan->gambar_utama && File::exists(public_path($lahan->gambar_utama))) {
+                File::delete(public_path($lahan->gambar_utama));
             }
-            $dataToUpdate['gambar_utama'] = $request->file('gambar_utama')->store('lahan_images/utama', 'public');
+
+            $file = $request->file('gambar_utama');
+            $namaFile = uniqid() . '.' . $file->getClientOriginalExtension();
+            // Pindahkan file ke direktori baru
+            $file->move(public_path('asset_web_images/lahan'), $namaFile);
+            // Simpan jalur relatif ke database
+            $dataToUpdate['gambar_utama'] = 'asset_web_images/lahan/' . $namaFile;
         }
 
+        // Mengelola gambar galeri
         for ($i = 1; $i <= 3; $i++) {
             $galeriField = 'galeri_' . $i;
             if ($request->hasFile($galeriField)) {
-                if ($lahan->$galeriField && Storage::disk('public')->exists($lahan->$galeriField)) {
-                    Storage::disk('public')->delete($lahan->$galeriField);
+                // Hapus gambar galeri lama jika ada
+                if ($lahan->$galeriField && File::exists(public_path($lahan->$galeriField))) {
+                    File::delete(public_path($lahan->$galeriField));
                 }
-                $dataToUpdate[$galeriField] = $request->file($galeriField)->store('lahan_images/galeri', 'public');
+
+                $file = $request->file($galeriField);
+                $namaFile = uniqid() . '.' . $file->getClientOriginalExtension();
+                // Pindahkan file ke direktori baru
+                $file->move(public_path('asset_web_images/lahan'), $namaFile);
+                // Simpan jalur relatif ke database
+                $dataToUpdate[$galeriField] = 'asset_web_images/lahan/' . $namaFile;
             }
         }
 
@@ -174,15 +203,20 @@ class LahanManagementController extends Controller
         return redirect()->back()->with('success', 'Lahan "' . $lahan->judul . '" berhasil ditolak.');
     }
 
+    /**
+     * Menghapus data lahan secara permanen.
+     */
     public function destroy(Lahan $lahan)
     {
-        if ($lahan->gambar_utama && Storage::disk('public')->exists($lahan->gambar_utama)) {
-            Storage::disk('public')->delete($lahan->gambar_utama);
+        // Hapus gambar utama jika ada
+        if ($lahan->gambar_utama && File::exists(public_path($lahan->gambar_utama))) {
+            File::delete(public_path($lahan->gambar_utama));
         }
+        // Hapus gambar galeri jika ada
         for ($i = 1; $i <= 3; $i++) {
             $galeriField = 'galeri_' . $i;
-            if ($lahan->$galeriField && Storage::disk('public')->exists($lahan->$galeriField)) {
-                Storage::disk('public')->delete($lahan->$galeriField);
+            if ($lahan->$galeriField && File::exists(public_path($lahan->$galeriField))) {
+                File::delete(public_path($lahan->$galeriField));
             }
         }
         $lahan->delete();

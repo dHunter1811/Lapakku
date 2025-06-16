@@ -112,80 +112,80 @@
     <section class="results-section">
         <div class="container">
             @if(isset($lahanList) && $lahanList->total() > 0)
-                <div class="results-info">
-                    <p>Menampilkan <span>{{ $lahanList->firstItem() }}-{{ $lahanList->lastItem() }}</span> dari <span>{{ $lahanList->total() }}</span> properti</p>
-                </div>
+            <div class="results-info">
+                <p>Menampilkan <span>{{ $lahanList->firstItem() }}-{{ $lahanList->lastItem() }}</span> dari <span>{{ $lahanList->total() }}</span> properti</p>
+            </div>
             @endif
 
             <div class="property-grid">
                 @forelse ($lahanList ?? [] as $lahan)
-                    <div class="property-card">
-                        <div class="property-badge">{{ $lahan->tipe_lahan }}</div>
-                        <div class="property-image-container">
-                            <a href="{{ route('lahan.show', $lahan) }}">
-                                <img src="{{ $lahan->gambar_utama ? Storage::url($lahan->gambar_utama) : asset('images/property-placeholder.jpg') }}" alt="{{ $lahan->judul }}" loading="lazy">
-                            </a>
-                            <button class="favorite-button">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                    <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
-                                </svg>
-                            </button>
+                <div class="property-card">
+                    <div class="property-badge">{{ $lahan->tipe_lahan }}</div>
+                    <div class="property-image-container">
+                        <a href="{{ route('lahan.show', $lahan) }}">
+                            <img src="{{ $lahan->gambar_utama ? asset('asset_web_images/lahan/' . basename($lahan->gambar_utama)) : asset('images/property-placeholder.jpg') }}" alt="{{ $lahan->judul }}" loading="lazy">
+                        </a>
+                        <button class="favorite-button">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
+                            </svg>
+                        </button>
+                    </div>
+                    <div class="property-details">
+                        <div class="property-location">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+                                <circle cx="12" cy="10" r="3"></circle>
+                            </svg>
+                            {{ $lahan->lokasi }}
                         </div>
-                        <div class="property-details">
-                            <div class="property-location">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                    <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
-                                    <circle cx="12" cy="10" r="3"></circle>
-                                </svg>
-                                {{ $lahan->lokasi }}
+                        <h3 class="property-title">
+                            <a href="{{ route('lahan.show', $lahan) }}">{{ Str::limit($lahan->judul, 45) }}</a>
+                        </h3>
+                        <div class="property-price">
+                            Rp {{ number_format($lahan->harga_sewa, 0, ',', '.') }} <span>/bulan</span>
+                        </div>
+
+                        <div class="property-rating">
+                            @if($lahan->ratings_count > 0)
+                            <div class="stars">
+                                @for ($i = 1; $i <= 5; $i++)
+                                    @if ($i <=round($lahan->ratings_avg_rating))
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="#FFC107" stroke="#FFC107" stroke-width="1">
+                                        <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+                                    </svg>
+                                    @else
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#E0E0E0" stroke-width="1">
+                                        <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+                                    </svg>
+                                    @endif
+                                    @endfor
                             </div>
-                            <h3 class="property-title">
-                                <a href="{{ route('lahan.show', $lahan) }}">{{ Str::limit($lahan->judul, 45) }}</a>
-                            </h3>
-                            <div class="property-price">
-                                Rp {{ number_format($lahan->harga_sewa, 0, ',', '.') }} <span>/bulan</span>
-                            </div>
-                            
-                            <div class="property-rating">
-                                @if($lahan->ratings_count > 0)
-                                    <div class="stars">
-                                        @for ($i = 1; $i <= 5; $i++)
-                                            @if ($i <= round($lahan->ratings_avg_rating))
-                                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="#FFC107" stroke="#FFC107" stroke-width="1">
-                                                    <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
-                                                </svg>
-                                            @else
-                                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#E0E0E0" stroke-width="1">
-                                                    <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
-                                                </svg>
-                                            @endif
-                                        @endfor
-                                    </div>
-                                    <span class="rating-text">{{ number_format($lahan->ratings_avg_rating, 1) }} ({{ $lahan->ratings_count }} ulasan)</span>
-                                @else
-                                    <span class="no-rating">Belum ada ulasan</span>
-                                @endif
-                            </div>
-                            
-                            <div class="property-footer">
-                                <span class="time-posted">Tayang {{ $lahan->created_at->diffForHumans() }}</span>
-                                <a href="{{ route('lahan.show', $lahan) }}" class="btn btn-detail">Lihat Detail</a>
-                            </div>
+                            <span class="rating-text">{{ number_format($lahan->ratings_avg_rating, 1) }} ({{ $lahan->ratings_count }} ulasan)</span>
+                            @else
+                            <span class="no-rating">Belum ada ulasan</span>
+                            @endif
+                        </div>
+
+                        <div class="property-footer">
+                            <span class="time-posted">Tayang {{ $lahan->created_at->diffForHumans() }}</span>
+                            <a href="{{ route('lahan.show', $lahan) }}" class="btn btn-detail">Lihat Detail</a>
                         </div>
                     </div>
+                </div>
                 @empty
-                    <div class="empty-state">
-                        <img src="{{ asset('images/no-results.svg') }}" alt="No results found">
-                        <h3>Tidak ada lahan yang ditemukan</h3>
-                        <p>Coba ubah kriteria pencarian Anda atau <a href="{{ route('lahan.index') }}">reset filter</a></p>
-                    </div>
+                <div class="empty-state">
+                    <img src="{{ asset('images/no-results.svg') }}" alt="No results found">
+                    <h3>Tidak ada lahan yang ditemukan</h3>
+                    <p>Coba ubah kriteria pencarian Anda atau <a href="{{ route('lahan.index') }}">reset filter</a></p>
+                </div>
                 @endforelse
             </div>
 
             @if(isset($lahanList) && $lahanList->hasPages())
-                <div class="pagination-wrapper">
-                    {{ $lahanList->appends(request()->query())->links('pagination::custom') }}
-                </div>
+            <div class="pagination-wrapper">
+                {{ $lahanList->appends(request()->query())->links('pagination::custom') }}
+            </div>
             @endif
         </div>
     </section>
@@ -226,7 +226,8 @@
 
     /* Hero Section */
     .listing-hero {
-        background: linear-gradient(rgba(0, 121, 107, 0.9), rgba(0, 105, 92, 0.9)), url('{{ asset('images/city-bg.jpg') }}');
+        background: linear-gradient(rgba(0, 121, 107, 0.9), rgba(0, 105, 92, 0.9)),
+        url('{{ asset(' images/city-bg.jpg') }}');
         background-size: cover;
         background-position: center;
         color: var(--white);
@@ -415,7 +416,8 @@
 
     .property-image-container {
         position: relative;
-        padding-top: 75%; /* 4:3 aspect ratio */
+        padding-top: 75%;
+        /* 4:3 aspect ratio */
         overflow: hidden;
     }
 
@@ -597,19 +599,19 @@
         .hero-title {
             font-size: 2rem;
         }
-        
+
         .hero-subtitle {
             font-size: 1.1rem;
         }
-        
+
         .filter-grid {
             grid-template-columns: 1fr;
         }
-        
+
         .filter-actions {
             margin-top: 8px;
         }
-        
+
         .property-grid {
             grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
         }
@@ -619,11 +621,11 @@
         .listing-hero {
             padding: 60px 0;
         }
-        
+
         .hero-title {
             font-size: 1.8rem;
         }
-        
+
         .property-grid {
             grid-template-columns: 1fr;
         }
@@ -648,8 +650,7 @@
         // Filter form submission enhancements (no changes needed for basic functionality)
         const filterForm = document.getElementById('filterForm');
         if (filterForm) {
-            filterForm.addEventListener('submit', function(e) {
-            });
+            filterForm.addEventListener('submit', function(e) {});
         }
     });
 </script>

@@ -60,7 +60,7 @@
                                             {{ Str::limit($lahan->judul, 30) }}
                                         </a>
                                         @if($lahan->gambar_utama)
-                                            <img src="{{ Storage::url($lahan->gambar_utama) }}" alt="Thumb" class="table-thumbnail-inline">
+                                            <img src="{{ asset($lahan->gambar_utama) }}" alt="Thumb" class="table-thumbnail-inline">
                                         @endif
                                     </td>
                                     <td class="text-center">

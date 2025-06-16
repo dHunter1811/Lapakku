@@ -478,9 +478,9 @@
             <div class="lahan-detail-main">
                 <h1 class="lahan-title">{{ $lahan->judul }}</h1>
                 
-                <img src="{{ $lahan->gambar_utama ? Storage::url($lahan->gambar_utama) : 'https://placehold.co/1200x800/e2e8f0/94a3b8?text=Gambar+Utama' }}" 
-                     alt="Gambar Utama {{ $lahan->judul }}" 
-                     class="lahan-gambar-utama">
+                <img src="{{ $lahan->gambar_utama ? asset($lahan->gambar_utama) : 'https://placehold.co/1200x800/e2e8f0/94a3b8?text=Gambar+Utama' }}" 
+                    alt="Gambar Utama {{ $lahan->judul }}" 
+                    class="lahan-gambar-utama">
                 
                 <h3 class="section-title">Deskripsi Lokasi</h3>
                 <div class="lahan-text-block">
@@ -503,6 +503,7 @@
                 @endif
             </div>
 
+
             {{-- Sidebar Column --}}
             <div class="lahan-detail-sidebar">
                 <h2 class="lahan-harga">Rp {{ number_format($lahan->harga_sewa, 0, ',', '.') }} <span class="harga-suffix">/ bulan</span></h2>
@@ -520,8 +521,8 @@
                     
                     @if(!empty($galeriImages)) 
                         @foreach($galeriImages as $index => $gPath) 
-                            <a href="{{ Storage::url($gPath) }}" data-lightbox="galeri-lahan" data-title="Galeri {{ $index + 1 }}" class="galeri-thumbnail-link">
-                                <img src="{{ Storage::url($gPath) }}" alt="Galeri Lokasi {{ $index + 1 }}" class="galeri-thumbnail-img">
+                            <a href="{{ asset($gPath) }}" data-lightbox="galeri-lahan" data-title="Galeri {{ $index + 1 }}" class="galeri-thumbnail-link">
+                                <img src="{{ asset($gPath) }}" alt="Galeri Lokasi {{ $index + 1 }}" class="galeri-thumbnail-img">
                             </a> 
                         @endforeach 
                         @for ($i = count($galeriImages); $i < 3; $i++) 
@@ -540,7 +541,7 @@
                         </p> 
                     @endif
                 </div>
-                
+            </div>                
                 <h4 class="sidebar-subtitle"><i class="fas fa-map-marked-alt mr-2"></i>Lokasi di Peta</h4>
                 @if($lahan->latitude && $lahan->longitude)
                     <div id="mapDisplay"></div>

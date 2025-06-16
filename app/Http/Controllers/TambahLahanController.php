@@ -64,14 +64,22 @@ class TambahLahanController extends Controller
         }
 
         if ($request->hasFile('gambar_utama')) {
-            $dataToCreate['gambar_utama'] = $request->file('gambar_utama')->store('asset_web_images/lahan', 'public');
+            $file = $request->file('gambar_utama');
+            $namaFile = uniqid() . '.' . $file->getClientOriginalExtension();
+            $file->move(public_path('asset_web_images/lahan'), $namaFile);
+            $dataToCreate['gambar_utama'] = 'asset_web_images/lahan/' . $namaFile;
         }
+
         for ($i = 1; $i <= 3; $i++) {
             $galeriField = 'galeri_' . $i;
             if ($request->hasFile($galeriField)) {
-                $dataToCreate[$galeriField] = $request->file($galeriField)->store('asset_web_images/lahan', 'public');
+                $file = $request->file($galeriField);
+                $namaFile = uniqid() . '.' . $file->getClientOriginalExtension();
+                $file->move(public_path('asset_web_images/lahan'), $namaFile);
+                $dataToCreate[$galeriField] = 'asset_web_images/lahan/' . $namaFile;
             }
         }
+
 
         Lahan::create($dataToCreate);
 

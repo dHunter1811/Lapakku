@@ -190,23 +190,23 @@
             <div class="row">
                 <div class="col-md-6">
                     <div class="form-group"><label for="tipe_lahan" class="form-label">Tipe Lahan</label><select name="tipe_lahan" id="tipe_lahan" class="form-control form-select" required>
-                            <option value="">-- Pilih --</option>
-                            <option value="Ruko" {{ old('tipe_lahan', $lahan->tipe_lahan) == 'Ruko' ? 'selected' : '' }}>Ruko</option>
-                            <option value="Kios" {{ old('tipe_lahan', $lahan->tipe_lahan) == 'Kios' ? 'selected' : '' }}>Kios</option>
-                            <option value="Pasar" {{ old('tipe_lahan', $lahan->tipe_lahan) == 'Pasar' ? 'selected' : '' }}>Pasar</option>
-                            <option value="Lahan Terbuka" {{ old('tipe_lahan', $lahan->tipe_lahan) == 'Lahan Terbuka' ? 'selected' : '' }}>Lahan Terbuka</option>
-                            <option value="Lainnya" {{ old('tipe_lahan', $lahan->tipe_lahan) == 'Lainnya' ? 'selected' : '' }}>Lainnya</option>
-                        </select></div>
+                                <option value="">-- Pilih --</option>
+                                <option value="Ruko" {{ old('tipe_lahan', $lahan->tipe_lahan) == 'Ruko' ? 'selected' : '' }}>Ruko</option>
+                                <option value="Kios" {{ old('tipe_lahan', $lahan->tipe_lahan) == 'Kios' ? 'selected' : '' }}>Kios</option>
+                                <option value="Pasar" {{ old('tipe_lahan', $lahan->tipe_lahan) == 'Pasar' ? 'selected' : '' }}>Pasar</option>
+                                <option value="Lahan Terbuka" {{ old('tipe_lahan', $lahan->tipe_lahan) == 'Lahan Terbuka' ? 'selected' : '' }}>Lahan Terbuka</option>
+                                <option value="Lainnya" {{ old('tipe_lahan', $lahan->tipe_lahan) == 'Lainnya' ? 'selected' : '' }}>Lainnya</option>
+                            </select></div>
                 </div>
                 <div class="col-md-6">
                     <div class="form-group"><label for="lokasi" class="form-label">Lokasi</label><select name="lokasi" id="lokasi" class="form-control form-select" required>
-                            <option value="">-- Pilih --</option>
-                            <option value="Banjarmasin Selatan" {{ old('lokasi', $lahan->lokasi) == 'Banjarmasin Selatan' ? 'selected' : '' }}>Banjarmasin Selatan</option>
-                            <option value="Banjarmasin Timur" {{ old('lokasi', $lahan->lokasi) == 'Banjarmasin Timur' ? 'selected' : '' }}>Banjarmasin Timur</option>
-                            <option value="Banjarmasin Barat" {{ old('lokasi', $lahan->lokasi) == 'Banjarmasin Barat' ? 'selected' : '' }}>Banjarmasin Barat</option>
-                            <option value="Banjarmasin Tengah" {{ old('lokasi', $lahan->lokasi) == 'Banjarmasin Tengah' ? 'selected' : '' }}>Banjarmasin Tengah</option>
-                            <option value="Banjarmasin Utara" {{ old('lokasi', $lahan->lokasi) == 'Banjarmasin Utara' ? 'selected' : '' }}>Banjarmasin Utara</option>
-                        </select></div>
+                                <option value="">-- Pilih --</option>
+                                <option value="Banjarmasin Selatan" {{ old('lokasi', $lahan->lokasi) == 'Banjarmasin Selatan' ? 'selected' : '' }}>Banjarmasin Selatan</option>
+                                <option value="Banjarmasin Timur" {{ old('lokasi', $lahan->lokasi) == 'Banjarmasin Timur' ? 'selected' : '' }}>Banjarmasin Timur</option>
+                                <option value="Banjarmasin Barat" {{ old('lokasi', $lahan->lokasi) == 'Banjarmasin Barat' ? 'selected' : '' }}>Banjarmasin Barat</option>
+                                <option value="Banjarmasin Tengah" {{ old('lokasi', $lahan->lokasi) == 'Banjarmasin Tengah' ? 'selected' : '' }}>Banjarmasin Tengah</option>
+                                <option value="Banjarmasin Utara" {{ old('lokasi', $lahan->lokasi) == 'Banjarmasin Utara' ? 'selected' : '' }}>Banjarmasin Utara</option>
+                            </select></div>
                 </div>
             </div>
             <div class="form-group"><label for="harga_sewa" class="form-label">Harga Sewa/bln (Rp)</label><input type="number" name="harga_sewa" id="harga_sewa" class="form-control" value="{{ old('harga_sewa', $lahan->harga_sewa) }}" required min="1"></div>
@@ -254,7 +254,7 @@
                 <label for="gambar_utama" class="form-label">Gambar Utama Lahan</label>
                 @if($lahan->gambar_utama)
                 <div class="current-image-display">
-                    <img src="{{ Storage::url($lahan->gambar_utama) }}" alt="Gambar Utama Saat Ini">
+                    <img src="{{ asset('asset_web_images/lahan/' . basename($lahan->gambar_utama)) }}" alt="Gambar Utama Saat Ini">
                     <small class="d-block text-muted">Gambar saat ini</small>
                 </div>
                 @else
@@ -275,7 +275,7 @@
                         <label for="{{ $galeriField }}" class="form-label-sm">Gambar Galeri {{ $i }}</label>
                         @if($lahan->$galeriField)
                         <div class="current-image-display galeri-image-wrapper">
-                            <img src="{{ Storage::url($lahan->$galeriField) }}" alt="Galeri {{ $i }} Saat Ini">
+                            <img src="{{ asset('asset_web_images/lahan/' . basename($lahan->$galeriField)) }}" alt="Galeri {{ $i }} Saat Ini">
                         </div>
                         @endif
                         <input type="file" name="{{ $galeriField }}" id="{{ $galeriField }}" class="form-control form-control-sm" accept="image/png, image/jpeg, image/jpg, image/gif">

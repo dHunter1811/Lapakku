@@ -191,11 +191,19 @@
 
             <div class="form-group">
                 <label>Galeri Lokasi (Opsional, maksimal 3 gambar)</label>
-                {{-- ... (Input Galeri seperti sebelumnya) ... --}}
                 <div class="row">
-                    <div class="col-md-4 mb-2"><label for="galeri_1" class="form-label-sm">Gambar Galeri 1</label><input type="file" name="galeri_1" id="galeri_1" class="form-control-file form-control-sm" accept="image/png, image/jpeg, image/jpg, image/gif"></div>
-                    <div class="col-md-4 mb-2"><label for="galeri_2" class="form-label-sm">Gambar Galeri 2</label><input type="file" name="galeri_2" id="galeri_2" class="form-control-file form-control-sm" accept="image/png, image/jpeg, image/jpg, image/gif"></div>
-                    <div class="col-md-4 mb-2"><label for="galeri_3" class="form-label-sm">Gambar Galeri 3</label><input type="file" name="galeri_3" id="galeri_3" class="form-control-file form-control-sm" accept="image/png, image/jpeg, image/jpg, image/gif"></div>
+                    <div class="col-md-4 mb-2">
+                        <label for="galeri_1" class="form-label-sm">Gambar Galeri 1</label>
+                        <input type="file" name="galeri_1" id="galeri_1" class="form-control-file form-control-sm" accept="image/png, image/jpeg, image/jpg, image/gif">
+                    </div>
+                    <div class="col-md-4 mb-2">
+                        <label for="galeri_2" class="form-label-sm">Gambar Galeri 2</label>
+                        <input type="file" name="galeri_2" id="galeri_2" class="form-control-file form-control-sm" accept="image/png, image/jpeg, image/jpg, image/gif">
+                    </div>
+                    <div class="col-md-4 mb-2">
+                        <label for="galeri_3" class="form-label-sm">Gambar Galeri 3</label>
+                        <input type="file" name="galeri_3" id="galeri_3" class="form-control-file form-control-sm" accept="image/png, image/jpeg, image/jpg, image/gif">
+                    </div>
                 </div>
                 <small class="form-text text-muted">Format: JPG, PNG, GIF. Maks: 2MB per gambar.</small>
             </div>

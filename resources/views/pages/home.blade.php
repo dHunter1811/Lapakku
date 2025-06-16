@@ -56,7 +56,7 @@
             @forelse ($rekomendasiLahan ?? [] as $lahan)
                 <div class="product-card">
                     <a href="{{ route('lahan.show', $lahan) }}">
-                        <img src="{{ $lahan->gambar_utama ? Storage::url($lahan->gambar_utama) : 'https://via.placeholder.com/300x200.png?text=Lapakku' }}" alt="{{ $lahan->judul }}">
+                        <img src="{{ $lahan->gambar_utama ? asset($lahan->gambar_utama) : 'https://via.placeholder.com/300x200.png?text=Lapakku' }}" alt="{{ $lahan->judul }}">
                     </a>
                     <div class="product-card-content">
                         <h3><a href="{{ route('lahan.show', $lahan) }}" style="text-decoration:none; color: #333;">{{ Str::limit($lahan->judul, 45) }}</a></h3>
