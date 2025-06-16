@@ -72,7 +72,7 @@ class AuthController extends Controller
             'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
             'password' => ['required', 'string', 'min:8', 'confirmed'],
             'alamat' => ['nullable', 'string', 'max:1000'],
-            'no_telepon' => ['nullable', 'string', 'max:20'],
+            'no_telepon' => ['required', 'string', 'max:20'],
             'profile_photo' => ['nullable', 'image', 'mimes:jpeg,png,jpg', 'max:2048'],
         ]);
 
