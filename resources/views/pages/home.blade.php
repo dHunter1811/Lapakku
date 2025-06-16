@@ -54,52 +54,38 @@
         </h2>
         <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
             @forelse ($rekomendasiLahan ?? [] as $lahan)
-                <div class="product-card bg-white rounded-xl shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition duration-300 flex flex-col">
-                    <a href="{{ route('lahan.show', $lahan) }}" class="block overflow-hidden rounded-t-xl">
-                        <img src="{{ $lahan->gambar_utama ? Storage::url($lahan->gambar_utama) : 'https://placehold.co/400x250/E5E7EB/4B5563?text=Lapakku' }}" 
-                             alt="{{ $lahan->judul }}" 
-                             class="w-full h-48 object-cover transition duration-300 hover:scale-105"
-                             onerror="this.onerror=null;this.src='https://placehold.co/400x250/E5E7EB/4B5563?text=Lapakku';"
-                             >
+                <div class="product-card">
+                    <a href="{{ route('lahan.show', $lahan) }}">
+                        <img src="{{ $lahan->gambar_utama ? Storage::url($lahan->gambar_utama) : 'https://via.placeholder.com/300x200.png?text=Lapakku' }}" alt="{{ $lahan->judul }}">
                     </a>
-                    <div class="p-5 flex flex-col flex-grow">
-                        <h3 class="text-xl font-semibold text-gray-900 hover:text-emerald-700 mb-2 h-14 overflow-hidden leading-tight">
-                            <a href="{{ route('lahan.show', $lahan) }}" class="block">{{ Str::limit($lahan->judul, 45) }}</a>
-                        </h3>
-                        <div class="text-2xl font-bold text-emerald-600 mb-2">
-                            Rp {{ number_format($lahan->harga_sewa, 0, ',', '.') }} / bulan
+                    <div class="product-card-content">
+                        <h3><a href="{{ route('lahan.show', $lahan) }}" style="text-decoration:none; color: #333;">{{ Str::limit($lahan->judul, 45) }}</a></h3>
+                        <div class="price">Rp {{ number_format($lahan->harga_sewa, 0, ',', '.') }} / bulan</div>
+                        <div class="location" style="font-size:0.85em; color:#555; margin-bottom: 5px;">
+                             <span class="badge-tipe">{{ $lahan->tipe_lahan }}</span> - {{ $lahan->lokasi }}
                         </div>
-                        <div class="text-sm text-gray-600 mb-3 flex items-center">
-                            <span class="inline-block bg-gray-500 text-white text-xs px-2 py-1 rounded-full font-medium mr-2">{{ $lahan->tipe_lahan }}</span>
-                            <svg class="w-4 h-4 text-gray-500 mr-1" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd"></path></svg>
-                            {{ $lahan->lokasi }}
-                        </div>
-                        <div class="text-sm mb-3 flex items-center text-yellow-500">
+                        <div class="rating" style="font-size:0.9em; margin-bottom: 5px; color: #E67E22;">
                             @if(isset($lahan->ratings_avg_rating) && $lahan->ratings_avg_rating > 0)
                                 @for ($i = 1; $i <= 5; $i++)
                                     @if ($i <= round($lahan->ratings_avg_rating))
-                                        &#9733; {{-- Filled star --}}
+                                        ★ <!-- Bintang terisi -->
                                     @else
-                                        &#9734; {{-- Empty star --}}
+                                        ☆ <!-- Bintang kosong -->
                                     @endif
                                 @endfor
-                                <span class="ml-2 font-semibold text-gray-700">({{ number_format($lahan->ratings_avg_rating, 1) }})</span>
-                                <span class="text-gray-500 ml-1">({{ $lahan->ratings_count }} ulasan)</span>
+                                ({{ number_format($lahan->ratings_avg_rating, 1) }})
+                                <span style="color:#777; font-size:0.9em;">- {{ $lahan->ratings_count }} ulasan</span>
                             @else
-                                <span class="text-gray-500">Belum ada ulasan</span>
+                                <span style="color:#777;">Belum ada ulasan</span>
                             @endif
                         </div>
-                        <div class="text-xs text-gray-500 mb-4">
-                            Tayang {{ $lahan->created_at->diffForHumans() }}
-                        </div>
-                        <a href="{{ route('lahan.show', $lahan) }}" class="mt-auto w-full bg-emerald-600 hover:bg-emerald-700 text-white font-semibold py-3 rounded-lg text-center transition duration-300 ease-in-out shadow-md hover:shadow-lg">
-                            Lihat Detail
-                        </a>
+                        <div class="time" style="font-size:0.8em; color:#777;">Tayang {{ $lahan->created_at->diffForHumans() }}</div>
+                        <a href="{{ route('lahan.show', $lahan) }}" class="btn btn-primary btn-sm" style="width:100%; text-align:center; margin-top:10px; background-color:#00796B; border-color:#00796B;">Lihat Detail</a>
                     </div>
                 </div>
             @empty
-                <div class="col-span-full bg-white p-8 rounded-xl shadow-lg text-center text-gray-600">
-                    <p class="text-lg">Belum ada lahan yang direkomendasikan saat ini.</p>
+                <div style="grid-column: 1 / -1; text-align:center; padding: 20px;" class="card">
+                    <p>Belum ada lahan yang direkomendasikan saat ini.</p>
                 </div>
             @endforelse
         </div>
@@ -136,33 +122,16 @@
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
 <script src="https://cdn.tailwindcss.com"></script>
 <style>
-    /* Custom CSS for patterns or specific overrides if needed */
-    body {
-        font-family: 'Inter', sans-serif;
-        @apply bg-gray-50 text-gray-800; /* Apply default background and text color */
-    }
-
-    /* Subtle background pattern for hero section */
-    .bg-pattern {
-        background-image: radial-gradient(circle at center, rgba(0, 121, 107, 0.05) 1px, transparent 1px);
-        background-size: 20px 20px;
-    }
-
-    /* Basic responsiveness for inputs if not fully covered by Tailwind */
-    input[type="text"].focus\:ring-emerald-500:focus {
-        outline: none !important;
-        box-shadow: 0 0 0 3px rgba(5, 150, 105, 0.45); /* Equivalent of ring-2 and ring-emerald-500 */
-    }
-
-    /* Hide scrollbar for overflow-hidden elements but allow content to be there */
-    .h-14 {
-        line-height: 1.2; /* Adjust line-height for better text wrapping */
-    }
-
-    /* Ensure a smooth transition on images when hovered */
-    .product-card img {
-        transition: transform 0.3s ease-in-out;
-    }
-    
+    /* Anda mungkin sudah memiliki style ini dari halaman index, pastikan konsisten */
+    .product-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 20px; }
+    .product-card { border: 1px solid #eee; border-radius: 8px; overflow: hidden; background: white; box-shadow: 0 2px 5px rgba(0,0,0,0.07); display: flex; flex-direction: column; }
+    .product-card img { width: 100%; height: 180px; object-fit: cover; }
+    .product-card-content { padding: 15px; display: flex; flex-direction: column; flex-grow: 1; }
+    .product-card-content h3 { margin-top: 0; font-size: 1.1em; margin-bottom: 8px; height: 40px; overflow:hidden; line-height: 1.2; }
+    .product-card-content .price { font-weight: bold; color: #00796B; margin-bottom: 5px; }
+    .product-card-content .location { margin-bottom: 5px; }
+    .badge-tipe { display: inline-block; padding: .25em .6em; font-size: 75%; font-weight: 700; line-height: 1; text-align: center; white-space: nowrap; vertical-align: baseline; border-radius: .25rem; background-color: #6c757d; color: white; }
+    .btn-sm { padding: .3rem .6rem; font-size: .875rem; }
+    .category-card:hover { transform: translateY(-3px); box-shadow: 0 4px 8px rgba(0,0,0,0.1); transition: all 0.2s ease-in-out; }
 </style>
 @endpush

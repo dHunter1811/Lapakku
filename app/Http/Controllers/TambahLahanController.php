@@ -33,20 +33,26 @@ class TambahLahanController extends Controller
             'galeri_1' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
             'galeri_2' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
             'galeri_3' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
-        ],[
+        ], [
             'latitude.regex' => 'Format latitude tidak valid.',
             'longitude.regex' => 'Format longitude tidak valid.',
         ]);
 
         if ($validator->fails()) {
             return redirect()->route('lahanbaru.tambah')
-                        ->withErrors($validator)
-                        ->withInput();
+                ->withErrors($validator)
+                ->withInput();
         }
 
         $dataToCreate = $request->only([
-            'judul', 'deskripsi', 'tipe_lahan', 'lokasi', 'harga_sewa', 'alamat_lengkap',
-            'latitude', 'longitude',
+            'judul',
+            'deskripsi',
+            'tipe_lahan',
+            'lokasi',
+            'harga_sewa',
+            'alamat_lengkap',
+            'latitude',
+            'longitude',
             'no_whatsapp' // === FIELD DIAMBIL DARI REQUEST ===
         ]);
         $dataToCreate['user_id'] = Auth::id();
@@ -58,12 +64,12 @@ class TambahLahanController extends Controller
         }
 
         if ($request->hasFile('gambar_utama')) {
-            $dataToCreate['gambar_utama'] = $request->file('gambar_utama')->store('lahan_images/utama', 'public');
+            $dataToCreate['gambar_utama'] = $request->file('gambar_utama')->store('asset_web_images/lahan', 'public');
         }
         for ($i = 1; $i <= 3; $i++) {
             $galeriField = 'galeri_' . $i;
             if ($request->hasFile($galeriField)) {
-                $dataToCreate[$galeriField] = $request->file($galeriField)->store('lahan_images/galeri', 'public');
+                $dataToCreate[$galeriField] = $request->file($galeriField)->store('asset_web_images/lahan', 'public');
             }
         }
 

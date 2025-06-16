@@ -99,3 +99,8 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::put('users/{user}', [AdminUserManagementController::class, 'update'])->name('users.update');
     Route::delete('users/{user}', [AdminUserManagementController::class, 'destroy'])->name('users.destroy');
 });
+
+// // LOG RAILWAY HEALTH CHECK
+// Route::get('/health', function () {
+//     return response('OK', 200);
+// });
