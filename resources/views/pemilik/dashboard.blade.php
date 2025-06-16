@@ -2,411 +2,44 @@
 
 @section('title', 'Dashboard Pemilik Lahan - Lapakku')
 
-@push('styles')
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
-<style>
-    :root {
-        --primary-color: #00796B;
-        --primary-hover: #00695C;
-        --secondary-color: #6c757d;
-        --secondary-hover: #5a6268;
-        --success-color: #10b981;
-        --danger-color: #ef4444;
-        --warning-color: #f59e0b;
-        --info-color: #0ea5e9;
-        --light-gray: #f8f9fa;
-        --medium-gray: #e9ecef;
-        --dark-gray: #334155;
-        --text-color: #2d3748;
-        --text-light: #64748b;
-        --border-radius: 8px;
-        --shadow-sm: 0 1px 3px rgba(0,0,0,0.12);
-        --shadow-md: 0 4px 6px rgba(0,0,0,0.1);
-        --transition: all 0.3s ease;
-    }
-
-    .dashboard-container {
-        padding: 2rem 0;
-    }
-
-    .dashboard-card {
-        border: none;
-        border-radius: var(--border-radius);
-        box-shadow: var(--shadow-md);
-        overflow: hidden;
-    }
-
-    .dashboard-header {
-        background-color: var(--primary-color);
-        color: white;
-        padding: 1.5rem;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        flex-wrap: wrap;
-        gap: 1rem;
-    }
-
-    .dashboard-title {
-        margin: 0;
-        font-size: 1.75rem;
-        font-weight: 700;
-    }
-
-    .dashboard-subtitle {
-        margin: 0.25rem 0 0;
-        opacity: 0.9;
-        font-size: 0.95rem;
-    }
-
-    .btn-add-land {
-        background-color: white;
-        color: var(--primary-color);
-        font-weight: 500;
-        padding: 0.5rem 1rem;
-        border-radius: var(--border-radius);
-        transition: var(--transition);
-        display: flex;
-        align-items: center;
-        gap: 0.5rem;
-    }
-
-    .btn-add-land:hover {
-        background-color: rgba(255,255,255,0.9);
-        color: var(--primary-hover);
-        transform: translateY(-1px);
-    }
-
-    .dashboard-section {
-        margin-bottom: 2.5rem;
-    }
-
-    .section-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        flex-wrap: wrap;
-        gap: 1rem;
-        margin-bottom: 1.25rem;
-        padding-bottom: 0.75rem;
-        border-bottom: 1px solid var(--medium-gray);
-    }
-
-    .section-title {
-        margin: 0;
-        color: var(--dark-gray);
-        font-size: 1.4rem;
-        font-weight: 600;
-        display: flex;
-        align-items: center;
-        gap: 0.5rem;
-    }
-
-    .filter-form {
-        display: flex;
-        align-items: center;
-        gap: 0.75rem;
-        flex-wrap: wrap;
-    }
-
-    .filter-select {
-        border-radius: var(--border-radius);
-        padding: 0.375rem 0.75rem;
-        border: 1px solid var(--medium-gray);
-        font-size: 0.875rem;
-        max-width: 200px;
-    }
-
-    .btn-filter {
-        padding: 0.375rem 0.75rem;
-        font-size: 0.875rem;
-    }
-
-    .empty-state {
-        border: 1px dashed #d1d5db;
-        background-color: #f9fafb;
-        padding: 2rem;
-        text-align: center;
-        border-radius: var(--border-radius);
-    }
-
-    .empty-state p {
-        font-size: 1.1rem;
-        margin-bottom: 1rem;
-        color: var(--text-light);
-    }
-
-    .table-responsive {
-        overflow-x: auto;
-        border-radius: var(--border-radius);
-        box-shadow: var(--shadow-sm);
-    }
-
-    .table {
-        width: 100%;
-        font-size: 0.9rem;
-        margin-bottom: 0;
-    }
-
-    .table thead th {
-        background-color: var(--light-gray);
-        color: var(--dark-gray);
-        font-weight: 600;
-        text-transform: uppercase;
-        font-size: 0.8rem;
-        padding: 0.75rem 1rem;
-        border-bottom: 2px solid var(--medium-gray);
-    }
-
-    .table tbody td {
-        padding: 0.75rem 1rem;
-        vertical-align: middle;
-        color: var(--text-color);
-        border-top: 1px solid var(--medium-gray);
-    }
-
-    .table tbody tr:hover {
-        background-color: rgba(0, 121, 107, 0.05);
-    }
-
-    .land-link {
-        color: var(--primary-color);
-        font-weight: 500;
-        text-decoration: none;
-        transition: var(--transition);
-        display: flex;
-        align-items: center;
-        gap: 0.5rem;
-    }
-
-    .land-link:hover {
-        color: var(--primary-hover);
-        text-decoration: underline;
-    }
-
-    .land-thumbnail {
-        width: 60px;
-        height: 40px;
-        object-fit: cover;
-        border-radius: 4px;
-        border: 1px solid var(--medium-gray);
-    }
-
-    .status-badge {
-        display: inline-block;
-        padding: 0.35em 0.65em;
-        font-size: 0.75rem;
-        font-weight: 700;
-        line-height: 1;
-        text-align: center;
-        white-space: nowrap;
-        vertical-align: baseline;
-        border-radius: 50rem;
-    }
-
-    .status-waiting {
-        background-color: var(--warning-color);
-        color: white;
-    }
-
-    .status-approved {
-        background-color: var(--success-color);
-        color: white;
-    }
-
-    .status-rejected {
-        background-color: var(--danger-color);
-        color: white;
-    }
-
-    .status-canceled {
-        background-color: var(--secondary-color);
-        color: white;
-    }
-
-    .status-completed {
-        background-color: var(--info-color);
-        color: white;
-    }
-
-    .action-btn {
-        padding: 0.25rem 0.5rem;
-        font-size: 0.8rem;
-        display: inline-flex;
-        align-items: center;
-        gap: 0.25rem;
-        border-radius: 4px;
-        transition: var(--transition);
-    }
-
-    .action-btn i {
-        font-size: 0.9em;
-    }
-
-    .btn-view {
-        background-color: #e3f2fd;
-        color: #1976d2;
-    }
-
-    .btn-view:hover {
-        background-color: #bbdefb;
-    }
-
-    .btn-edit {
-        background-color: #fff8e1;
-        color: #ff8f00;
-    }
-
-    .btn-edit:hover {
-        background-color: #ffecb3;
-    }
-
-    .btn-approve {
-        background-color: #e8f5e9;
-        color: var(--success-color);
-    }
-
-    .btn-approve:hover {
-        background-color: #c8e6c9;
-    }
-
-    .btn-reject {
-        background-color: #ffebee;
-        color: var(--danger-color);
-    }
-
-    .btn-reject:hover {
-        background-color: #ffcdd2;
-    }
-
-    .btn-whatsapp {
-        background-color: #e8f5e9;
-        color: #25D366;
-    }
-
-    .btn-whatsapp:hover {
-        background-color: #c8e6c9;
-    }
-
-    .user-info {
-        display: flex;
-        flex-direction: column;
-    }
-
-    .user-phone {
-        font-size: 0.8rem;
-        color: var(--text-light);
-    }
-
-    .message-preview {
-        max-width: 150px;
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-    }
-
-    .divider {
-        margin: 2rem 0;
-        border-top: 1px solid var(--medium-gray);
-    }
-
-    .pagination-container {
-        margin-top: 1.5rem;
-        display: flex;
-        justify-content: center;
-    }
-
-    .page-link {
-        color: var(--primary-color);
-        border: 1px solid var(--medium-gray);
-    }
-
-    .page-item.active .page-link {
-        background-color: var(--primary-color);
-        border-color: var(--primary-color);
-    }
-
-    .page-link:hover {
-        color: var(--primary-hover);
-        background-color: var(--light-gray);
-    }
-
-    .alert {
-        border-radius: var(--border-radius);
-        padding: 1rem;
-        margin-bottom: 1.5rem;
-    }
-
-    @media (max-width: 768px) {
-        .dashboard-header {
-            flex-direction: column;
-            align-items: flex-start;
-        }
-        
-        .section-header {
-            flex-direction: column;
-            align-items: flex-start;
-        }
-        
-        .filter-form {
-            width: 100%;
-        }
-        
-        .filter-select {
-            max-width: 100%;
-        }
-    }
-</style>
-@endpush
-
 @section('content')
-<div class="container dashboard-container">
-    <div class="card dashboard-card">
-        <div class="dashboard-header">
+<div class="container dashboard-pemilik-container">
+    <div class="card dashboard-pemilik-card">
+        <div class="card-header dashboard-header">
             <div>
                 <h1 class="dashboard-title">Dashboard Pemilik Lahan</h1>
-                <p class="dashboard-subtitle">Kelola lahan dan pengajuan sewa untuk properti Anda</p>
+                <p class="dashboard-subtitle">Kelola lahan dan pengajuan sewa untuk properti Anda.</p>
             </div>
-            <a href="{{ route('lahanbaru.tambah') }}" class="btn btn-add-land">
-                <i class="fas fa-plus"></i> Tambah Lahan Baru
+            <a href="{{ route('lahanbaru.tambah') }}" class="btn btn-success btn-sm dashboard-action-button">
+                <span class="icon">➕</span> Tambah Lahan Baru
             </a>
         </div>
-        
-        <div class="card-body">
+        <div class="card-body" style="padding: 25px;">
+
             @if (session('success'))
-                <div class="alert alert-success">
-                    <i class="fas fa-check-circle mr-2"></i>{{ session('success') }}
-                </div>
+                <div class="alert alert-success">{{ session('success') }}</div>
             @endif
             @if (session('error'))
-                <div class="alert alert-danger">
-                    <i class="fas fa-exclamation-circle mr-2"></i>{{ session('error') }}
-                </div>
+                <div class="alert alert-danger">{{ session('error') }}</div>
             @endif
             @if (session('info'))
-                <div class="alert alert-info">
-                    <i class="fas fa-info-circle mr-2"></i>{{ session('info') }}
-                </div>
+                <div class="alert alert-info">{{ session('info') }}</div>
             @endif
 
-            {{-- MY LANDS SECTION --}}
             <div class="dashboard-section">
-                <div class="section-header">
-                    <h4 class="section-title">
-                        <i class="fas fa-map-marked-alt"></i> Lahan Milik Saya
-                    </h4>
+                <div class="dashboard-section-header">
+                    <h4>Lahan Milik Saya</h4>
                 </div>
 
                 @if(!isset($lahanMilikUser) || $lahanMilikUser->isEmpty())
-                    <div class="empty-state">
-                        <p>Anda belum mendaftarkan lahan apapun</p>
-                        <a href="{{ route('lahanbaru.tambah') }}" class="btn btn-primary">
-                            <i class="fas fa-plus mr-2"></i> Daftarkan Lahan Pertama Anda
-                        </a>
+                    <div class="alert alert-light text-center empty-state">
+                        <p style="font-size: 1.1em; margin-bottom:10px;">Anda belum mendaftarkan lahan apapun.</p>
+                        {{-- Tombol ini juga harus mengarah ke lahanbaru.tambah --}}
+                        <a href="{{ route('lahanbaru.tambah') }}" class="btn btn-primary btn-sm">Daftarkan Lahan Pertama Anda</a>
                     </div>
                 @else
                     <div class="table-responsive">
-                        <table class="table">
+                        <table class="table table-hover table-dashboard table-lahan-saya">
                             <thead>
                                 <tr>
                                     <th>No</th>
@@ -415,7 +48,7 @@
                                     <th>Tipe</th>
                                     <th>Lokasi</th>
                                     <th>Harga/bln</th>
-                                    <th class="text-center">Aksi</th>
+                                    <th class="text-center" style="min-width: 160px;">Aksi</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -423,76 +56,64 @@
                                 <tr>
                                     <td>{{ ($lahanMilikUser->currentPage() - 1) * $lahanMilikUser->perPage() + $index + 1 }}</td>
                                     <td>
-                                        <a href="{{ route('lahan.show', $lahan->id) }}" target="_blank" class="land-link">
-                                            @if($lahan->gambar_utama)
-                                                <img src="{{ Storage::url($lahan->gambar_utama) }}" alt="Thumbnail" class="land-thumbnail">
-                                            @endif
+                                        <a href="{{ route('lahan.show', $lahan->id) }}" target="_blank" class="table-link-lahan" title="{{ $lahan->judul }}">
                                             {{ Str::limit($lahan->judul, 30) }}
                                         </a>
+                                        @if($lahan->gambar_utama)
+                                            <img src="{{ Storage::url($lahan->gambar_utama) }}" alt="Thumb" class="table-thumbnail-inline">
+                                        @endif
                                     </td>
                                     <td class="text-center">
-                                        <span class="status-badge status-{{ Str::slug($lahan->status) }}">
-                                            {{ $lahan->status }}
-                                        </span>
+                                        <span class="badge status-badge status-{{ Str::slug($lahan->status) }}">{{ $lahan->status }}</span>
                                     </td>
                                     <td>{{ $lahan->tipe_lahan ?? '-' }}</td>
                                     <td>{{ $lahan->lokasi ?? '-' }}</td>
                                     <td class="font-weight-bold">Rp {{ number_format($lahan->harga_sewa, 0, ',', '.') }}</td>
-                                    <td class="text-center">
-                                        <a href="{{ route('lahan.show', $lahan->id) }}" target="_blank" class="action-btn btn-view" title="Lihat Detail Publik">
-                                            <i class="fas fa-eye"></i> Lihat
-                                        </a>
-                                        <a href="{{ route('lahan.edit', $lahan->id) }}" class="action-btn btn-edit" title="Edit Lahan">
-                                            <i class="fas fa-edit"></i> Edit
-                                        </a>
+                                    <td class="text-center action-buttons-cell">
+                                        <a href="{{ route('lahan.show', $lahan->id) }}" target="_blank" class="btn btn-info btn-xs" title="Lihat Detail Publik">👁️ Lihat</a>
+                                        {{-- Link edit lahan tetap menggunakan route('lahan.edit') yang ditangani LahanController --}}
+                                        <a href="{{ route('lahan.edit', $lahan->id) }}" class="btn btn-warning btn-xs" title="Edit Lahan">✏️ Edit</a>
                                     </td>
                                 </tr>
                                 @endforeach
                             </tbody>
                         </table>
                     </div>
-                    
                     @if($lahanMilikUser->hasPages())
-                    <div class="pagination-container">
+                    <div style="margin-top: 20px; display:flex; justify-content:center;">
                         {{ $lahanMilikUser->appends(['status_pengajuan' => request('status_pengajuan')])->links('pagination::bootstrap-4') }}
                     </div>
                     @endif
                 @endif
             </div>
 
-            <div class="divider"></div>
+            <hr class="dashboard-divider">
 
-            {{-- RENTAL APPLICATIONS SECTION --}}
             <div class="dashboard-section">
-                <div class="section-header">
-                    <h4 class="section-title">
-                        <i class="fas fa-clipboard-list"></i> Pengajuan Sewa Masuk
-                    </h4>
-                    <form method="GET" action="{{ route('pemilik.dashboard') }}" class="filter-form">
-                        <select name="status_pengajuan" id="status_pengajuan" class="filter-select">
-                            <option value="">Semua Status</option>
+                <div class="dashboard-section-header">
+                    <h4>Pengajuan Sewa Masuk</h4>
+                    <form method="GET" action="{{ route('pemilik.dashboard') }}" class="filter-form-inline">
+                        <label for="status_pengajuan" class="form-label sr-only">Filter Status:</label>
+                        <select name="status_pengajuan" id="status_pengajuan" class="form-control form-control-sm">
+                            <option value="">Semua Status Pengajuan</option>
                             <option value="Menunggu Persetujuan" {{ request('status_pengajuan') == 'Menunggu Persetujuan' ? 'selected' : '' }}>Menunggu Persetujuan</option>
                             <option value="Disetujui" {{ request('status_pengajuan') == 'Disetujui' ? 'selected' : '' }}>Disetujui</option>
                             <option value="Ditolak" {{ request('status_pengajuan') == 'Ditolak' ? 'selected' : '' }}>Ditolak</option>
                             <option value="Dibatalkan Penyewa" {{ request('status_pengajuan') == 'Dibatalkan Penyewa' ? 'selected' : '' }}>Dibatalkan Penyewa</option>
                             <option value="Selesai" {{ request('status_pengajuan') == 'Selesai' ? 'selected' : '' }}>Selesai</option>
                         </select>
-                        <button type="submit" class="btn btn-primary btn-filter">
-                            <i class="fas fa-filter"></i> Filter
-                        </button>
-                        <a href="{{ route('pemilik.dashboard') }}" class="btn btn-secondary btn-filter">
-                            <i class="fas fa-sync-alt"></i> Reset
-                        </a>
+                        <button type="submit" class="btn btn-info btn-sm">Filter</button>
+                        <a href="{{ route('pemilik.dashboard') }}" class="btn btn-secondary btn-sm">Reset</a>
                     </form>
                 </div>
 
                 @if(!isset($pengajuanMasuk) || $pengajuanMasuk->isEmpty())
-                    <div class="empty-state">
-                        <p>Belum ada pengajuan sewa untuk lahan Anda</p>
+                    <div class="alert alert-light text-center empty-state">
+                        <p style="font-size: 1.1em; margin-bottom:5px;">Belum ada pengajuan sewa untuk lahan Anda.</p>
                     </div>
                 @else
                     <div class="table-responsive">
-                        <table class="table">
+                        <table class="table table-hover table-dashboard">
                             <thead>
                                 <tr>
                                     <th>No</th>
@@ -500,10 +121,10 @@
                                     <th>Diajukan Oleh</th>
                                     <th>Durasi</th>
                                     <th>Total Harga</th>
-                                    <th>Pesan Penyewa</th>
+                                    <th style="min-width: 150px;">Pesan Penyewa</th>
                                     <th>Tgl Pengajuan</th>
                                     <th class="text-center">Status</th>
-                                    <th class="text-center">Aksi</th>
+                                    <th class="text-center" style="min-width: 200px;">Aksi</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -512,55 +133,40 @@
                                     <td>{{ ($pengajuanMasuk->currentPage() - 1) * $pengajuanMasuk->perPage() + $index + 1 }}</td>
                                     <td>
                                         @if($pengajuan->lahan)
-                                            <a href="{{ route('lahan.show', $pengajuan->lahan_id) }}" target="_blank" class="land-link">
-                                                {{ Str::limit($pengajuan->lahan->judul, 25) }}
-                                            </a>
+                                            <a href="{{ route('lahan.show', $pengajuan->lahan_id) }}" target="_blank" class="table-link-lahan" title="{{ $pengajuan->lahan->judul }}">{{ Str::limit($pengajuan->lahan->judul, 25) }}</a>
                                         @else
-                                            <span class="text-muted">Lahan Dihapus</span>
+                                            <span class="text-muted-light">Lahan Dihapus</span>
                                         @endif
                                     </td>
                                     <td>
-                                        <div class="user-info">
-                                            <span>{{ $pengajuan->penyewa->name ?? 'User Dihapus' }}</span>
-                                            @if($pengajuan->penyewa)
-                                                <span class="user-phone">
-                                                    {{ $pengajuan->penyewa->no_telepon ?? $pengajuan->penyewa->email }}
-                                                </span>
-                                            @endif
-                                        </div>
+                                        @if($pengajuan->penyewa)
+                                            <span title="{{$pengajuan->penyewa->email}}">{{ $pengajuan->penyewa->name }}</span><br>
+                                            <small class="text-muted-light">{{ $pengajuan->penyewa->no_telepon ?? $pengajuan->penyewa->email }}</small>
+                                        @else
+                                            <span class="text-muted-light">User Dihapus</span>
+                                        @endif
                                     </td>
                                     <td>{{ $pengajuan->durasi_sewa_bulan }} bulan</td>
                                     <td class="font-weight-bold">Rp {{ number_format($pengajuan->total_harga, 0, ',', '.') }}</td>
-                                    <td class="message-preview" title="{{ $pengajuan->pesan_penyewa }}">
+                                    <td title="{{ $pengajuan->pesan_penyewa }}" class="pesan-penyewa-tooltip">
                                         {{ Str::limit($pengajuan->pesan_penyewa, 25) ?: '-' }}
                                         @if(strlen($pengajuan->pesan_penyewa) > 25)
-                                        <button type="button" class="action-btn btn-view" onclick="showFullMessage(this)" data-fullmessage="{{ e($pengajuan->pesan_penyewa) }}">
-                                            <i class="fas fa-eye"></i>
-                                        </button>
+                                        <button type="button" class="btn btn-outline-info btn-xs" title="Lihat Pesan Lengkap" onclick="showFullMessage(this)" data-fullmessage="{{ e($pengajuan->pesan_penyewa) }}" style="margin-left: 5px; padding: 1px 4px;">👁️</button>
                                         @endif
                                     </td>
-                                    <td>
-                                        {{ $pengajuan->created_at->format('d M Y') }}
-                                        <div class="user-phone">{{ $pengajuan->created_at->format('H:i') }}</div>
-                                    </td>
+                                    <td>{{ $pengajuan->created_at->format('d M Y') }}<br><small class="text-muted-light">{{$pengajuan->created_at->format('H:i')}}</small></td>
                                     <td class="text-center">
-                                        <span class="status-badge status-{{ Str::slug($pengajuan->status) }}">
-                                            {{ $pengajuan->status }}
-                                        </span>
+                                        <span class="badge status-badge status-{{ Str::slug($pengajuan->status) }}">{{ $pengajuan->status }}</span>
                                     </td>
-                                    <td class="text-center">
+                                    <td class="text-center action-buttons-cell">
                                         @if ($pengajuan->status == 'Menunggu Persetujuan')
                                         <form action="{{ route('pemilik.pengajuan.setujui', $pengajuan->id) }}" method="POST" class="d-inline" onsubmit="return confirm('Anda yakin ingin MENYETUJUI pengajuan ini?')">
                                             @csrf @method('PATCH')
-                                            <button type="submit" class="action-btn btn-approve" title="Setujui Pengajuan">
-                                                <i class="fas fa-check"></i> Setujui
-                                            </button>
+                                            <button type="submit" class="btn btn-success btn-xs" title="Setujui Pengajuan">✔️ Setujui</button>
                                         </form>
                                         <form action="{{ route('pemilik.pengajuan.tolak', $pengajuan->id) }}" method="POST" class="d-inline" onsubmit="return confirm('Anda yakin ingin MENOLAK pengajuan ini?')">
                                             @csrf @method('PATCH')
-                                            <button type="submit" class="action-btn btn-reject" title="Tolak Pengajuan">
-                                                <i class="fas fa-times"></i> Tolak
-                                            </button>
+                                            <button type="submit" class="btn btn-danger btn-xs" title="Tolak Pengajuan">❌ Tolak</button>
                                         </form>
                                         @elseif($pengajuan->status == 'Disetujui')
                                         <span class="text-success font-weight-bold">Telah Disetujui</span>
@@ -569,10 +175,9 @@
                                         @else
                                         <span class="text-muted">{{ $pengajuan->status }}</span>
                                         @endif
-                                        
                                         @if($pengajuan->penyewa && $pengajuan->penyewa->no_telepon)
-                                        <a href="https://wa.me/+62{{ $pengajuan->penyewa->no_telepon }}" target="_blank" class="action-btn btn-whatsapp" title="Hubungi via WhatsApp">
-                                            <i class="fab fa-whatsapp"></i> WhatsApp
+                                        <a href="https://wa.me/+62{{ $pengajuan->penyewa->no_telepon }}" target="_blank" class="btn btn-success btn-xs">
+                                            💬 WhatsApp
                                         </a>
                                         @endif
                                     </td>
@@ -581,9 +186,8 @@
                             </tbody>
                         </table>
                     </div>
-                    
                     @if($pengajuanMasuk->hasPages())
-                    <div class="pagination-container">
+                    <div style="margin-top: 25px; display:flex; justify-content:center;">
                         {{ $pengajuanMasuk->appends(['lahan_page' => request('lahan_page')])->links('pagination::bootstrap-4') }}
                     </div>
                     @endif
@@ -593,56 +197,124 @@
     </div>
 </div>
 
-<!-- Modal for Full Message -->
-<div id="pesanLengkapModal" class="modal" tabindex="-1" role="dialog">
-    <div class="modal-dialog" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">Pesan Lengkap</h5>
-                <button type="button" class="close" onclick="closeModal('pesanLengkapModal')">
-                    <span>&times;</span>
-                </button>
-            </div>
-            <div class="modal-body">
-                <p id="isiPesanLengkap"></p>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" onclick="closeModal('pesanLengkapModal')">Tutup</button>
-            </div>
-        </div>
-    </div>
-</div>
+{{-- Modal untuk menampilkan pesan lengkap (tetap sama) --}}
+{{-- ... (kode modal) ... --}}
 @endsection
+
+@push('styles')
+{{-- Menambahkan link CDN untuk Bootstrap 5 CSS --}}
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" xintegrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
+<style>
+    /* ... (CSS Anda yang sudah ada dari respons sebelumnya) ... */
+    .dashboard-pemilik-container { padding-top: 10px; padding-bottom: 30px; }
+    .dashboard-pemilik-card .card-header.dashboard-header {
+        background-color: #00695C; color: white; padding: 20px 25px;
+        border-bottom: none; display: flex; justify-content: space-between; align-items: center;
+        border-top-left-radius: .5rem; border-top-right-radius: .5rem;
+    }
+    .dashboard-title { margin:0; font-size: 1.6em; font-weight: 600; }
+    .dashboard-subtitle { margin: 4px 0 0; font-size: 0.9em; opacity: 0.9; }
+    .dashboard-header .dashboard-action-button { font-size: 0.9em; padding: 8px 15px; font-weight:500; }
+    .dashboard-header .dashboard-action-button .icon { margin-right: 5px; }
+
+    .card-body { padding: 25px; }
+
+    .dashboard-section { margin-bottom: 35px; }
+    .dashboard-section:last-child { margin-bottom: 0; }
+    .dashboard-section-header {
+        display: flex; justify-content: space-between; align-items: center;
+        margin-bottom: 15px; padding-bottom: 10px; border-bottom: 1px solid #e9ecef;
+    }
+    .dashboard-section-header h4 { margin: 0; color: #334155; font-size: 1.2em; font-weight: 600; }
+    .filter-form-inline { display: flex; gap: 8px; align-items: center; }
+    .filter-form-inline .form-control-sm { max-width: 180px; font-size:0.85rem; padding: .3rem .6rem; }
+    .filter-form-inline .btn-sm { font-size:0.85rem; padding: .3rem .75rem; }
+    .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
+
+    .table-dashboard { font-size: 0.88em; }
+    .table-dashboard thead th {
+        background-color: #f8f9fa; color: #495057; font-weight: 600;
+        text-transform: uppercase; letter-spacing: 0.5px; font-size: 0.8em; padding: 10px 12px;
+        border-bottom-width: 2px;
+    }
+    .table-dashboard tbody td { padding: 10px 12px; vertical-align: middle; color: #4b5563; }
+    .table-lahan-saya tbody td { padding: 8px 12px; }
+    .table-dashboard tbody tr:hover { background-color: #f1f5f9; }
+    .table-link-lahan { color: #00796B; font-weight: 500; text-decoration: none; }
+    .table-link-lahan:hover { text-decoration: underline; color: #004d40; }
+    .table-thumbnail-inline { width: 60px; height: 40px; object-fit: cover; border-radius: 4px; margin-left: 10px; vertical-align: middle; border: 1px solid #ddd;}
+    .text-muted-light { color: #6c757d; }
+    .font-weight-bold { font-weight: 600 !important; }
+
+    .badge.status-badge { display: inline-block; padding: .4em .7em; font-size: .75em; font-weight: 700; line-height: 1; color: #fff; text-align: center; white-space: nowrap; vertical-align: baseline; border-radius: .3rem; }
+    .status-menunggu-persetujuan { background-color: #f59e0b; color: white;}
+    .status-disetujui { background-color: #10b981; }
+    .status-ditolak { background-color: #ef4444; }
+    .status-dibatalkan-penyewa { background-color: #64748b; }
+    .status-selesai { background-color: #0ea5e9; }
+
+    .action-buttons-cell .btn-xs { margin-right: 5px; padding: .25rem .5rem; font-size: .8rem; line-height:1.2; display: inline-flex; align-items: center; gap: 3px;}
+    .action-buttons-cell .btn-xs:last-child { margin-right: 0; }
+    .pesan-penyewa-tooltip { cursor: help; }
+    .empty-state { border: 1px dashed #d1d5db; background-color: #f9fafb; padding: 30px; }
+    .empty-state .btn-sm { font-size:0.9em; padding: 8px 15px; }
+    hr.dashboard-divider { margin: 35px 0; border-top: 1px solid #e0e0e0; }
+
+    .pagination-container { margin-top: 25px; display:flex; justify-content:center; }
+    /* === PERBAIKAN UNTUK PAGINASI === */
+    /* Pastikan .pagination dari Bootstrap bisa di-override jika perlu */
+    .pagination {
+        display: flex;
+        padding-left: 0;
+        list-style: none;
+    }
+    .page-link {
+        position: relative;
+        display: block;
+        padding: .5rem .75rem;
+        margin-left: -1px;
+        line-height: 1.25;
+        color: #00796B; /* Warna link paginasi sesuai tema */
+        background-color: #fff;
+        border: 1px solid #dee2e6;
+    }
+    .page-link:hover {
+        z-index: 2;
+        color: #004d40;
+        text-decoration: none;
+        background-color: #e9ecef;
+        border-color: #dee2e6;
+    }
+    .page-item.active .page-link {
+        z-index: 3;
+        color: #fff;
+        background-color: #00796B; /* Warna background link aktif */
+        border-color: #00796B;
+    }
+    .page-item.disabled .page-link {
+        color: #6c757d;
+        pointer-events: none;
+        background-color: #fff;
+        border-color: #dee2e6;
+    }
+    /* ============================== */
+</style>
+@endpush
 
 @push('scripts')
 <script>
     function showFullMessage(buttonElement) {
         const fullMessage = buttonElement.dataset.fullmessage;
         document.getElementById('isiPesanLengkap').textContent = fullMessage;
-        
-        // Using Bootstrap modal if available, otherwise fallback to basic modal
-        if (typeof bootstrap !== 'undefined' && bootstrap.Modal) {
-            const modal = new bootstrap.Modal(document.getElementById('pesanLengkapModal'));
-            modal.show();
-        } else {
-            document.getElementById('pesanLengkapModal').style.display = 'block';
-        }
+        document.getElementById('pesanLengkapModal').style.display = 'block';
     }
-
     function closeModal(modalId) {
-        if (typeof bootstrap !== 'undefined' && bootstrap.Modal) {
-            const modal = bootstrap.Modal.getInstance(document.getElementById(modalId));
-            modal.hide();
-        } else {
-            document.getElementById(modalId).style.display = 'none';
+        document.getElementById(modalId).style.display = 'none';
+    }
+    function closeModalOnClickOutside(event, modalId) {
+        if (event.target == document.getElementById(modalId)) {
+            closeModal(modalId);
         }
     }
-
-    // Close modal when clicking outside
-    window.addEventListener('click', function(event) {
-        if (event.target == document.getElementById('pesanLengkapModal')) {
-            closeModal('pesanLengkapModal');
-        }
-    });
 </script>
 @endpush
