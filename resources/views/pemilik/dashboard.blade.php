@@ -171,15 +171,17 @@
                                             @csrf @method('PATCH')
                                             <button type="submit" class="btn btn-danger btn-xs" title="Tolak Pengajuan">❌ Tolak</button>
                                         </form>
-                                        <a href="https://wa.me/{{ $pengajuan->penyewa->no_telepon }}" target="_blank" class="btn btn-success btn-xs">
-                                            💬 WhatsApp
-                                        </a>
                                         @elseif($pengajuan->status == 'Disetujui')
                                         <span class="text-success font-weight-bold">Telah Disetujui</span>
                                         @elseif($pengajuan->status == 'Ditolak')
                                         <span class="text-danger font-weight-bold">Telah Ditolak</span>
                                         @else
                                         <span class="text-muted">{{ $pengajuan->status }}</span>
+                                        @endif
+                                        @if($pengajuan->penyewa && $pengajuan->penyewa->no_telepon)
+                                        <a href="https://wa.me/{{ $pengajuan->penyewa->no_telepon }}" target="_blank" class="btn btn-success btn-xs">
+                                            💬 WhatsApp
+                                        </a>
                                         @endif
                                     </td>
                                 </tr>
