@@ -1,66 +1,143 @@
-<<<<<<< HEAD
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# Lapakku - Platform Penyewaan Tempat Usaha
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+![Logo Lapakku](<public/images/Jukung Lapakku.png>)
 
-## About Laravel
+**Menghubungkan Peluang, Membangun Usaha.**
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+Lapakku adalah sebuah platform web inovatif berbasis Laravel yang dirancang untuk menjadi jembatan antara pemilik lahan/properti dengan para pelaku UMKM di Banjarmasin yang sedang mencari lokasi usaha strategis. Proyek ini bertujuan untuk mendigitalisasi dan menyederhanakan proses pencarian dan penyewaan tempat usaha seperti ruko, kios, dan lahan terbuka.
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+---
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+## 📸 Tampilan Aplikasi
 
-## Learning Laravel
+Berikut adalah beberapa tampilan dari antarmuka website Lapakku:
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+| Halaman Utama | Halaman Detail Lahan | Dashboard Admin |
+| :---: | :---: | :---: |
+| ![Tampilan Halaman Utama Lapakku](<public/images/README/Halaman Home.png>) | ![Tampilan Halaman Detail Lahan](<public/images/README/Halaman Detail Lahan.png>) | ![Tampilan Dashboard Admin](<public/images/README/Dashboard Admin.png>) |
 
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
+---
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+## ✨ Fitur Utama
 
-## Laravel Sponsors
+### Untuk Pengguna (Pencari Lahan)
+- **Pencarian & Filter Lanjutan:** Cari lahan berdasarkan kata kunci, tipe lahan (Ruko, Kios, dll.), dan lokasi per kecamatan di Banjarmasin.
+- **Urutkan Hasil:** Urutkan hasil pencarian berdasarkan harga termurah, termahal, atau yang terbaru.
+- **Peta Interaktif:** Lihat lokasi pasti setiap lahan di peta interaktif pada halaman detail.
+- **Detail Lahan Lengkap:** Lihat informasi komprehensif termasuk deskripsi, harga, galeri foto, keuntungan lokasi, dan informasi pemilik.
+- **Sistem Rating & Ulasan:** Berikan rating dan ulasan untuk lahan yang pernah Anda sewa atau kunjungi.
+- **Kontak Langsung ke Pemilik:** Hubungi pemilik lahan secara langsung melalui tombol WhatsApp yang terintegrasi.
+- **Sistem Pengajuan Sewa:** Ajukan sewa secara formal melalui platform, lengkap dengan durasi sewa dan pesan untuk pemilik.
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+### Untuk Pemilik Lahan
+- **Manajemen Akun:** Pengguna dapat mendaftar, login, dan mengedit profil mereka, termasuk foto profil.
+- **Tambah & Kelola Lahan:** Pengguna dapat dengan mudah mendaftarkan lahan mereka melalui form yang intuitif, termasuk menentukan lokasi di peta.
+- **Dashboard Pemilik:** Halaman khusus untuk melihat daftar lahan yang dimiliki, serta mengelola pengajuan sewa yang masuk (menyetujui atau menolak).
 
-### Premium Partners
+### Untuk Administrator
+- **Dashboard Admin:** Ringkasan statistik mengenai total lahan, pengguna, rating, dan pesan masuk.
+- **Manajemen Penuh:** Admin memiliki kontrol penuh untuk mengelola (CRUD) data Lahan, Pengguna, Rating, dan Pesan Masuk.
+- **Persetujuan Lahan:** Admin dapat menyetujui atau menolak listing lahan baru yang diajukan oleh pengguna.
+- **Ekspor Data:** Kemampuan untuk mengekspor data dari setiap modul (Lahan, User, Rating, Pesan) ke format **Excel (.xlsx)** dan **PDF**.
 
-- **[Vehikl](https://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development)**
-- **[Active Logic](https://activelogic.com)**
+---
 
-## Contributing
+## 🛠️ Teknologi yang Digunakan
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+* **Backend:** PHP 8.2, Laravel 12
+* **Frontend:** Blade Templates, HTML5, CSS3, JavaScript
+* **Database:** MySQL
+* **Pustaka Pihak Ketiga:**
+    * **Leaflet.js:** Untuk peta interaktif.
+    * **Lightbox2:** Untuk galeri foto.
+    * **Maatwebsite/Excel:** Untuk fungsionalitas ekspor ke Excel.
+    * **Barryvdh/laravel-dompdf:** Untuk fungsionalitas ekspor ke PDF.
 
-## Code of Conduct
+---
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+## 🚀 Instalasi & Setup Lokal
 
-## Security Vulnerabilities
+Berikut adalah langkah-langkah untuk menjalankan proyek ini di lingkungan lokal Anda.
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+1.  **Clone Repositori**
+    ```bash
+    git clone [https://github.com/username-anda/lapakku.git](https://github.com/username-anda/lapakku.git)
+    cd lapakku
+    ```
 
-## License
+2.  **Instal Dependensi**
+    ```bash
+    composer install
+    npm install
+    npm run build
+    ```
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
-=======
-# Lapakku
-Project Pemrograman Website 2
->>>>>>> 9fb2349dd61b3d91d3b292c23c5b0bf4fa9f357f
+3.  **Konfigurasi Lingkungan**
+    * Salin file `.env.example` menjadi `.env`:
+        ```bash
+        cp .env.example .env
+        ```
+    * Buat kunci aplikasi baru:
+        ```bash
+        php artisan key:generate
+        ```
+    * Konfigurasikan koneksi database Anda di dalam file `.env`:
+        ```env
+        DB_CONNECTION=mysql
+        DB_HOST=127.0.0.1
+        DB_PORT=3306
+        DB_DATABASE=lapakku
+        DB_USERNAME=root
+        DB_PASSWORD=
+        ```
+
+4.  **Migrasi & Seeding Database**
+    * Jalankan migrasi untuk membuat semua tabel:
+        ```bash
+        php artisan migrate
+        ```
+    * (Opsional) Jalankan seeder untuk mengisi database dengan data contoh:
+        ```bash
+        php artisan db:seed
+        ```
+
+5.  **Storage Link**
+    * Buat symbolic link agar file yang diupload bisa diakses dari web:
+        ```bash
+        php artisan storage:link
+        ```
+
+6.  **Jalankan Aplikasi**
+    * Jalankan server pengembangan lokal:
+        ```bash
+        php artisan serve
+        ```
+    * Buka `http://127.0.0.1:8000` di browser Anda.
+
+---
+
+## 👨‍💻 Tim Pengembang
+
+Proyek "Lapakku" ini dikembangkan dengan penuh dedikasi dan semangat kolaborasi oleh tim mahasiswa dari **Universitas Lambung Mangkurat, Fakultas Keguruan dan Ilmu Pendidikan, Program Studi Pendidikan Komputer**.
+
+* **Muhammad Dimas Aditya**
+    * [![GitHub](https://img.shields.io/badge/GitHub-181717?style=for-the-badge&logo=github&logoColor=white)](https://github.com/dHunter1811)
+    * [![Instagram](https://img.shields.io/badge/Instagram-E4405F?style=for-the-badge&logo=instagram&logoColor=white)](https://www.instagram.com/dimas_1811?igsh=NzNlandzcjBhbmlv)
+* **Muhammad Farros Shofiy**
+    * [![GitHub](https://img.shields.io/badge/GitHub-181717?style=for-the-badge&logo=github&logoColor=white)](https://github.com/KizuAnee)
+    * [![Instagram](https://img.shields.io/badge/Instagram-E4405F?style=for-the-badge&logo=instagram&logoColor=white)](https://www.instagram.com/banwave10thperiod?igsh=MTlvbWE1NGIyZ2FyZg==)
+* **Akhmad Rizky Rahmatullah**
+    * [![GitHub](https://img.shields.io/badge/GitHub-181717?style=for-the-badge&logo=github&logoColor=white)](https://github.com/omogiri)
+    * [![Instagram](https://img.shields.io/badge/Instagram-E4405F?style=for-the-badge&logo=instagram&logoColor=white)](https://www.instagram.com/rizkl_?igsh=MWgyM3ptcmFrN2NrYQ==)
+
+---
+
+## 🤝 Kontribusi
+
+Kontribusi, isu, dan permintaan fitur sangat kami hargai. Jangan ragu untuk membuat *pull request* atau membuka *issue*.
+
+---
+
+## 📜 Lisensi
+
+Proyek ini berada di bawah Lisensi MIT. Lihat file `LICENSE` untuk detail lebih lanjut.
