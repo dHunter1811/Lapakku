@@ -65,8 +65,8 @@
                 </div>
 
                 <div class="form-group">
-                    <label for="no_telepon" class="form-label">No. Telepon (Opsional)</label>
-                    <input id="no_telepon" type="tel" name="no_telepon" class="form-control" value="{{ old('no_telepon') }}" placeholder="08123456xxxx">
+                    <label for="no_telepon" class="form-label">No. Telepon</label>
+                    <input id="no_telepon" type="tel" name="no_telepon" class="form-control" value="{{ old('no_telepon') }}" placeholder="+62 123-456x-xxxx">
                 </div>
 
                 <div class="form-group">
