@@ -6,8 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Lahan;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
-use Illuminate\Support\Facades\File; // Pastikan ini diimpor
-use Illuminate\Support\Facades\Storage; // Ini bisa tetap ada, tapi tidak digunakan untuk operasi file langsung di public_path
+use Illuminate\Support\Facades\File;
 
 // --- Import untuk Ekspor ---
 use Maatwebsite\Excel\Facades\Excel;
@@ -130,20 +129,9 @@ class LahanManagementController extends Controller
                 ->withInput();
         }
 
-        // Pastikan direktori penyimpanan gambar ada
-        File::makeDirectory(public_path('asset_web_images/lahan'), 0755, true, true);
-
         $dataToUpdate = $request->only([
-            'judul',
-            'deskripsi',
-            'tipe_lahan',
-            'lokasi',
-            'harga_sewa',
-            'alamat_lengkap',
-            'status',
-            'latitude',
-            'longitude',
-            'no_whatsapp'
+            'judul', 'deskripsi', 'tipe_lahan', 'lokasi', 'harga_sewa',
+            'alamat_lengkap', 'status', 'latitude', 'longitude', 'no_whatsapp'
         ]);
 
         if ($request->has('keuntungan_lokasi')) {
@@ -155,16 +143,15 @@ class LahanManagementController extends Controller
 
         // Mengelola gambar utama
         if ($request->hasFile('gambar_utama')) {
-            // Hapus gambar lama jika ada
             if ($lahan->gambar_utama && File::exists(public_path($lahan->gambar_utama))) {
                 File::delete(public_path($lahan->gambar_utama));
             }
+            
+            File::makeDirectory(public_path('asset_web_images/lahan'), 0755, true, true);
 
             $file = $request->file('gambar_utama');
             $namaFile = uniqid() . '.' . $file->getClientOriginalExtension();
-            // Pindahkan file ke direktori baru
             $file->move(public_path('asset_web_images/lahan'), $namaFile);
-            // Simpan jalur relatif ke database
             $dataToUpdate['gambar_utama'] = 'asset_web_images/lahan/' . $namaFile;
         }
 
@@ -172,16 +159,15 @@ class LahanManagementController extends Controller
         for ($i = 1; $i <= 3; $i++) {
             $galeriField = 'galeri_' . $i;
             if ($request->hasFile($galeriField)) {
-                // Hapus gambar galeri lama jika ada
                 if ($lahan->$galeriField && File::exists(public_path($lahan->$galeriField))) {
                     File::delete(public_path($lahan->$galeriField));
                 }
+                
+                File::makeDirectory(public_path('asset_web_images/lahan'), 0755, true, true);
 
                 $file = $request->file($galeriField);
                 $namaFile = uniqid() . '.' . $file->getClientOriginalExtension();
-                // Pindahkan file ke direktori baru
                 $file->move(public_path('asset_web_images/lahan'), $namaFile);
-                // Simpan jalur relatif ke database
                 $dataToUpdate[$galeriField] = 'asset_web_images/lahan/' . $namaFile;
             }
         }
@@ -208,11 +194,9 @@ class LahanManagementController extends Controller
      */
     public function destroy(Lahan $lahan)
     {
-        // Hapus gambar utama jika ada
         if ($lahan->gambar_utama && File::exists(public_path($lahan->gambar_utama))) {
             File::delete(public_path($lahan->gambar_utama));
         }
-        // Hapus gambar galeri jika ada
         for ($i = 1; $i <= 3; $i++) {
             $galeriField = 'galeri_' . $i;
             if ($lahan->$galeriField && File::exists(public_path($lahan->$galeriField))) {

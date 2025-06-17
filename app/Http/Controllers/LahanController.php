@@ -6,18 +6,16 @@ use App\Models\Lahan;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
-use Illuminate\Support\Facades\File; // Pastikan ini diimpor
+use Illuminate\Support\Facades\File; 
 
 class LahanController extends Controller
 {
     public function index(Request $request)
     {
-        // === PERUBAHAN DI SINI: Tambahkan withCount dan withAvg ===
         $query = Lahan::query()
-            ->withCount('ratings') // Menghitung jumlah rating, hasilnya di kolom 'ratings_count'
-            ->withAvg('ratings', 'rating') // Menghitung rata-rata, hasilnya di 'ratings_avg_rating'
+            ->withCount('ratings')
+            ->withAvg('ratings', 'rating')
             ->where('status', 'Disetujui');
-        // ========================================================
 
         if ($request->filled('tipe_lahan')) {
             $query->where('tipe_lahan', $request->tipe_lahan);
@@ -48,7 +46,7 @@ class LahanController extends Controller
                 break;
         }
 
-        $lahanList = $query->paginate(12); // Diubah menjadi 12 agar pas untuk grid
+        $lahanList = $query->paginate(12);
         return view('lahan.index', compact('lahanList'));
     }
 
@@ -59,6 +57,8 @@ class LahanController extends Controller
 
     public function store(Request $request)
     {
+        // Logika upload file di sini masih dalam bentuk komentar.
+        // Jika Anda menggunakan TambahLahanController.php, pastikan perbaikan serupa diterapkan di sana.
         $validator = Validator::make($request->all(), [
             'judul' => 'required|string|max:255',
             'deskripsi' => 'required|string',
@@ -83,20 +83,9 @@ class LahanController extends Controller
                 ->withInput();
         }
 
-        // Catatan: Logika upload file untuk store() belum ada di sini.
-        // Jika Anda ingin menambahkan logika upload gambar saat membuat lahan baru,
-        // mohon berikan instruksi terpisah.
-
         $dataToCreate = $request->only([
-            'judul',
-            'deskripsi',
-            'tipe_lahan',
-            'lokasi',
-            'harga_sewa',
-            'alamat_lengkap',
-            'latitude',
-            'longitude',
-            'no_whatsapp'
+            'judul', 'deskripsi', 'tipe_lahan', 'lokasi', 'harga_sewa',
+            'alamat_lengkap', 'latitude', 'longitude', 'no_whatsapp'
         ]);
         $dataToCreate['user_id'] = Auth::id();
         $dataToCreate['status'] = 'Menunggu';
@@ -105,27 +94,6 @@ class LahanController extends Controller
             $keuntungan = array_filter($request->keuntungan_lokasi, fn($value) => !is_null($value) && $value !== '');
             $dataToCreate['keuntungan_lokasi'] = !empty($keuntungan) ? array_values($keuntungan) : null;
         }
-
-        // --- Logika Penanganan Gambar di Metode Store (Opsional, jika Anda ingin menambahkannya) ---
-        // Anda bisa menambahkan logika serupa dengan metode 'update' di sini, misalnya:
-        // File::makeDirectory(public_path('asset_web_images/lahan'), 0755, true, true);
-        // if ($request->hasFile('gambar_utama')) {
-        //     $file = $request->file('gambar_utama');
-        //     $namaFile = uniqid() . '.' . $file->getClientOriginalExtension();
-        //     $file->move(public_path('asset_web_images/lahan'), $namaFile);
-        //     $dataToCreate['gambar_utama'] = 'asset_web_images/lahan/' . $namaFile;
-        // }
-        // for ($i = 1; $i <= 3; $i++) {
-        //     $galeriField = 'galeri_' . $i;
-        //     if ($request->hasFile($galeriField)) {
-        //         $file = $request->file($galeriField);
-        //         $namaFile = uniqid() . '.' . $file->getClientOriginalExtension();
-        //         $file->move(public_path('asset_web_images/lahan'), $namaFile);
-        //         $dataToCreate[$galeriField] = 'asset_web_images/lahan/' . $namaFile;
-        //     }
-        // }
-        // --- Akhir Logika Penanganan Gambar Opsional ---
-
 
         Lahan::create($dataToCreate);
         return redirect()->route('lahan.index')->with('success', 'Lahan berhasil ditambahkan dan sedang menunggu persetujuan.');
@@ -175,20 +143,10 @@ class LahanController extends Controller
         if ($validator->fails()) {
             return redirect()->route('lahan.edit', $lahan->id)->withErrors($validator)->withInput();
         }
-
-        // Pastikan direktori penyimpanan gambar ada sebelum memindahkan file
-        File::makeDirectory(public_path('asset_web_images/lahan'), 0755, true, true);
-
+        
         $dataToUpdate = $request->only([
-            'judul',
-            'deskripsi',
-            'tipe_lahan',
-            'lokasi',
-            'harga_sewa',
-            'alamat_lengkap',
-            'latitude',
-            'longitude',
-            'no_whatsapp'
+            'judul', 'deskripsi', 'tipe_lahan', 'lokasi', 'harga_sewa',
+            'alamat_lengkap', 'latitude', 'longitude', 'no_whatsapp'
         ]);
 
         if (optional(Auth::user())->role !== 'admin' && $lahan->status !== 'Disetujui') {
@@ -203,12 +161,12 @@ class LahanController extends Controller
         }
 
         if ($request->hasFile('gambar_utama')) {
-            // Hapus gambar lama jika ada
             if ($lahan->gambar_utama && File::exists(public_path($lahan->gambar_utama))) {
                 File::delete(public_path($lahan->gambar_utama));
             }
 
-            // Simpan gambar baru ke public/asset_web_images/lahan
+            File::makeDirectory(public_path('asset_web_images/lahan'), 0755, true, true);
+
             $file = $request->file('gambar_utama');
             $namaFile = uniqid() . '.' . $file->getClientOriginalExtension();
             $file->move(public_path('asset_web_images/lahan'), $namaFile);
@@ -218,12 +176,12 @@ class LahanController extends Controller
         for ($i = 1; $i <= 3; $i++) {
             $galeriField = 'galeri_' . $i;
             if ($request->hasFile($galeriField)) {
-                // Hapus gambar galeri lama jika ada
                 if ($lahan->$galeriField && File::exists(public_path($lahan->$galeriField))) {
                     File::delete(public_path($lahan->$galeriField));
                 }
 
-                // Simpan gambar galeri baru
+                File::makeDirectory(public_path('asset_web_images/lahan'), 0755, true, true);
+
                 $file = $request->file($galeriField);
                 $namaFile = uniqid() . '.' . $file->getClientOriginalExtension();
                 $file->move(public_path('asset_web_images/lahan'), $namaFile);
@@ -242,12 +200,10 @@ class LahanController extends Controller
             return redirect()->route('lahan.index')->with('error', 'Anda tidak memiliki izin untuk menghapus lahan ini.');
         }
 
-        // Hapus gambar utama
         if ($lahan->gambar_utama && File::exists(public_path($lahan->gambar_utama))) {
             File::delete(public_path($lahan->gambar_utama));
         }
 
-        // Hapus semua gambar galeri
         for ($i = 1; $i <= 3; $i++) {
             $galeriField = 'galeri_' . $i;
             if ($lahan->$galeriField && File::exists(public_path($lahan->$galeriField))) {

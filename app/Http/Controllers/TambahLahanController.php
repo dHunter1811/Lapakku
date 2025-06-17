@@ -6,7 +6,7 @@ use App\Models\Lahan;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
-use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\File;
 
 class TambahLahanController extends Controller
 {
@@ -24,7 +24,7 @@ class TambahLahanController extends Controller
             'lokasi' => 'required|string|in:Banjarmasin Selatan,Banjarmasin Timur,Banjarmasin Barat,Banjarmasin Tengah,Banjarmasin Utara',
             'harga_sewa' => 'required|numeric|min:1',
             'alamat_lengkap' => 'required|string',
-            'no_whatsapp' => ['nullable', 'string', 'regex:/^([0-9\s\-\+\(\)]*)$/', 'min:10', 'max:20'], // === VALIDASI DITAMBAHKAN ===
+            'no_whatsapp' => ['nullable', 'string', 'regex:/^([0-9\s\-\+\(\)]*)$/', 'min:10', 'max:20'],
             'keuntungan_lokasi' => 'nullable|array',
             'keuntungan_lokasi.*' => 'nullable|string|max:255',
             'latitude' => ['nullable', 'regex:/^[-]?(([0-8]?[0-9])\.(\d+)|90(\.0+)?)$/'],
@@ -45,15 +45,8 @@ class TambahLahanController extends Controller
         }
 
         $dataToCreate = $request->only([
-            'judul',
-            'deskripsi',
-            'tipe_lahan',
-            'lokasi',
-            'harga_sewa',
-            'alamat_lengkap',
-            'latitude',
-            'longitude',
-            'no_whatsapp' // === FIELD DIAMBIL DARI REQUEST ===
+            'judul', 'deskripsi', 'tipe_lahan', 'lokasi', 'harga_sewa',
+            'alamat_lengkap', 'latitude', 'longitude', 'no_whatsapp'
         ]);
         $dataToCreate['user_id'] = Auth::id();
         $dataToCreate['status'] = 'Menunggu';
@@ -64,6 +57,8 @@ class TambahLahanController extends Controller
         }
 
         if ($request->hasFile('gambar_utama')) {
+            File::makeDirectory(public_path('asset_web_images/lahan'), 0755, true, true);
+            
             $file = $request->file('gambar_utama');
             $namaFile = uniqid() . '.' . $file->getClientOriginalExtension();
             $file->move(public_path('asset_web_images/lahan'), $namaFile);
@@ -73,13 +68,14 @@ class TambahLahanController extends Controller
         for ($i = 1; $i <= 3; $i++) {
             $galeriField = 'galeri_' . $i;
             if ($request->hasFile($galeriField)) {
+                File::makeDirectory(public_path('asset_web_images/lahan'), 0755, true, true);
+
                 $file = $request->file($galeriField);
                 $namaFile = uniqid() . '.' . $file->getClientOriginalExtension();
                 $file->move(public_path('asset_web_images/lahan'), $namaFile);
                 $dataToCreate[$galeriField] = 'asset_web_images/lahan/' . $namaFile;
             }
         }
-
 
         Lahan::create($dataToCreate);
 
